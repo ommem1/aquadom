@@ -370,7 +370,7 @@ export default function Home() {
                   <div className="fg">
                     <label>Telegram (для уведомлений о статусе)</label>
                     <input value={form.telegram} onChange={e=>setForm({...form,telegram:e.target.value})} placeholder="@username"/>
-                    <div className="tg-hint">Начните диалог с ботом: <a href="https://t.me/AquaDomBot" target="_blank" rel="noopener">t.me/AquaDomBot</a></div>
+                    <div className="tg-hint">Начните диалог с ботом: <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener">t.me/aquadomm_bot</a></div>
                   </div>
                   {error && <div className="err">{error}</div>}
                   <button className="submit" onClick={handleSubmit} disabled={loading}>
@@ -412,7 +412,7 @@ export default function Home() {
               <span className="b2b-tag">🏥 Медучреждения</span>
             </div>
           </div>
-          <a href="https://t.me/AquaDomBot" target="_blank" rel="noopener" className="b2b-btn">
+          <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener" className="b2b-btn">
             Написать в Telegram →
           </a>
         </div>
@@ -422,7 +422,7 @@ export default function Home() {
         <div className="fl">💧 AquaDom</div>
         <div className="fsub">Дистиллированная вода для техники · Не для питья</div>
         <div className="fc">
-          <span>📱 @AquaDomBot</span>
+          <span>📱 @aquadomm_bot</span>
           <span>📍 Весь Узбекистан</span>
           <span>🌐 aquadom.uz</span>
         </div>
