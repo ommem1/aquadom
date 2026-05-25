@@ -58,43 +58,4 @@ export async function POST(request) {
   } catch (error) {
     return Response.json({ ok: true })
   }
-}    if (String(chatId) !== String(ADMIN_CHAT_ID)) {
-      return Response.json({ ok: true })
-    }
-
-    if (text === '/help') {
-      await sendTelegram(chatId, `💧 *AquaDom — Управление заказами*\n\nКоманды:\n\`/принят НОМЕР\`\n\`/в_пути НОМЕР\`\n\`/доставлен НОМЕР\`\n\`/отменён НОМЕР\``)
-      return Response.json({ ok: true })
-    }
-
-    const parts = text.trim().split(' ')
-    const cmd = parts[0]
-    const orderNum = parts[1]
-
-    if (STATUSES[cmd]) {
-      if (!orderNum) {
-        await sendTelegram(chatId, `⚠️ Укажи номер заказа. Пример: \`${cmd} 314585\``)
-        return Response.json({ ok: true })
-      }
-      const status = STATUSES[cmd]
-      await sendTelegram(chatId, `${status.emoji} Заказ *#${orderNum}* → *${status.text}*`)
-      return Response.json({ ok: true })
-    }
-
-    return Response.json({ ok: true })
-  } catch (error) {
-    return Response.json({ ok: true })
-  }
-}        await sendTelegram(chatId, `⚠️ Укажи номер заказа. Пример: \`${cmd} 314585\``)
-        return Response.json({ ok: true })
-      }
-      const status = STATUSES[cmd]
-      await sendTelegram(chatId, `${status.emoji} Заказ *#${orderNum}* → *${status.text}*`)
-      return Response.json({ ok: true })
-    }
-
-    return Response.json({ ok: true })
-  } catch (error) {
-    return Response.json({ ok: true })
-  }
 }
