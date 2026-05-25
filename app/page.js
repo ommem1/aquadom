@@ -15,6 +15,7 @@ export default function Home() {
   const [form, setForm] = useState({ name: '', phone: '', city: 'Ташкент', address: '', telegram: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [confirmedOrderNum, setConfirmedOrderNum] = useState('')
   const [error, setError] = useState('')
 
   const deliveries = size && freq && dur ? Math.floor(parseInt(dur) / parseInt(freq)) : 0
@@ -43,7 +44,7 @@ export default function Home() {
         })
       })
       const data = await res.json()
-      if (data.success) setSuccess(true)
+      if (data.success) { setSuccess(true); setConfirmedOrderNum(data.orderNum || '') }
       else setError('Ошибка отправки. Напишите нам в Telegram.')
     } catch {
       setError('Ошибка сети. Напишите нам в Telegram.')
@@ -382,7 +383,7 @@ export default function Home() {
                   <h3>✅ Заявка принята!</h3>
                   <div style={{margin:'16px 0',padding:'16px',background:'#E8F4FD',borderRadius:'12px',textAlign:'center'}}>
                     <div style={{fontSize:'13px',color:'#5A7090',marginBottom:'6px'}}>Номер вашего заказа</div>
-                    <div style={{fontSize:'32px',fontWeight:'800',color:'#0F4F85',letterSpacing:'3px',marginBottom:'12px'}}>{orderNum}</div>
+                    <div style={{fontSize:'32px',fontWeight:'800',color:'#0F4F85',letterSpacing:'3px',marginBottom:'12px'}}>{confirmedOrderNum}</div>
                     <button onClick={()=>{navigator.clipboard.writeText(orderNum).then(()=>alert('Номер скопирован!'))}} style={{background:'white',border:'1.5px solid #BEDAF5',borderRadius:'50px',padding:'8px 20px',fontSize:'13px',fontWeight:'700',color:'#1A6FB0',cursor:'pointer'}}>
                       Скопировать номер
                     </button>
