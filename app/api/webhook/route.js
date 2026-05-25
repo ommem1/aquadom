@@ -53,9 +53,15 @@ export async function POST(request) {
               '/rest/v1/orders?order_num=eq.' + orderNum,
               { telegram_id: String(chatId) }
             )
-            const statusMap = {'new':'В обработке','принят':'Принят','в_пути':'В пути','доставлен':'Доставлен','отменён':'Отменён'}
-const currentStatus = statusMap[orders[0].status] || 'В обработке'
-await sendTelegram(chatId, 'Заказ #' + orderNum + ' найден!\n\nТекущий статус: ' + currentStatus + '\n\nВы получите уведомление когда статус изменится.')
+            const statusMap = {
+              'new': 'В обработке',
+              'принят': 'Принят',
+              'в_пути': 'В пути',
+              'доставлен': 'Доставлен',
+              'отменён': 'Отменён'
+            }
+            const currentStatus = statusMap[orders[0].status] || 'В обработке'
+            await sendTelegram(chatId, 'Заказ #' + orderNum + ' найден!\n\nТекущий статус: ' + currentStatus + '\n\nВы получите уведомление когда статус изменится.')
           } else {
             await sendTelegram(chatId, 'Заказ #' + orderNum + ' не найден. Проверьте номер и попробуйте снова.')
           }
