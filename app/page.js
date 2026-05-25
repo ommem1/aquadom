@@ -12,7 +12,7 @@ export default function Home() {
   const [size, setSize] = useState(null)
   const [freq, setFreq] = useState(null)
   const [dur, setDur] = useState(null)
-  const [form, setForm] = useState({ name: '', phone: '', city: 'Ташкент', address: '', telegram: '' })
+  const [form, setForm] = useState({ name: '', phone: '+998', city: 'Ташкент', address: '', telegram: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [confirmedOrderNum, setConfirmedOrderNum] = useState('')
@@ -348,11 +348,23 @@ export default function Home() {
                   <div className="frow">
                     <div className="fg" style={{marginBottom:0}}>
                       <label>Имя</label>
-                      <input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Алишер"/>
+                      <input
+                        value={form.name}
+                        onChange={e => setForm({...form, name: e.target.value})}
+                        placeholder="Алишер"
+                      />
                     </div>
                     <div className="fg" style={{marginBottom:0}}>
                       <label>Телефон</label>
-                      <input value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} placeholder="+998 90 000 00 00" type="tel"/>
+                      <input
+                        value={form.phone}
+                        onChange={e => {
+                          const val = e.target.value
+                          if (val.startsWith('+998')) setForm({...form, phone: val})
+                        }}
+                        placeholder="+998 90 000 00 00"
+                        type="tel"
+                      />
                     </div>
                   </div>
                   <div className="fg">
