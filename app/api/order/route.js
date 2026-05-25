@@ -70,7 +70,6 @@ ${telegram ? `📱 *Telegram:* ${telegram}` : ''}
       body: JSON.stringify({
         chat_id: ADMIN_CHAT_ID,
         text: adminMsg,
-        parse_mode: 'Markdown'
       })
     })
 
