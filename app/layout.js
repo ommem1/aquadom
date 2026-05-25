@@ -1,10 +1,14 @@
 import './globals.css'
 
 export const metadata = {
+  metadataBase: new URL('https://aquadom.uz'),
   title: 'AquaDom — Дистиллированная вода с доставкой по Узбекистану',
   description: 'Дистиллированная вода для увлажнителей, утюгов, аккумуляторов и радиаторов. Доставка по всему Узбекистану. Подписка или разовый заказ.',
   keywords: 'дистиллированная вода Ташкент, дистиллят доставка Узбекистан, вода для аккумулятора, вода для увлажнителя, вода для утюга, купить дистиллят',
   authors: [{ name: 'AquaDom' }],
+  alternates: {
+    canonical: 'https://aquadom.uz',
+  },
   openGraph: {
     title: 'AquaDom — Дистиллированная вода с доставкой',
     description: 'Дистиллированная вода для техники. Доставка по всему Узбекистану.',
@@ -13,11 +17,21 @@ export const metadata = {
     locale: 'ru_UZ',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AquaDom — Дистиллированная вода с доставкой',
+    description: 'Дистиллированная вода для техники. Доставка по всему Узбекистану.',
+  },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
-  metadataBase: new URL('https://aquadom.uz'),
 }
 
 export default function RootLayout({ children }) {
@@ -31,14 +45,50 @@ export default function RootLayout({ children }) {
           "name": "AquaDom",
           "description": "Дистиллированная вода для техники с доставкой по Узбекистану",
           "url": "https://aquadom.uz",
-          "telephone": "",
+          "image": "https://aquadom.uz/opengraph-image",
           "address": {
             "@type": "PostalAddress",
             "addressCountry": "UZ",
             "addressLocality": "Ташкент"
           },
-          "areaServed": "Узбекистан",
-          "priceRange": "30000-85000 UZS"
+          "areaServed": {
+            "@type": "Country",
+            "name": "Узбекистан"
+          },
+          "priceRange": "30000-85000 UZS",
+          "sameAs": [
+            "https://t.me/aquadomm_bot"
+          ],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Дистиллированная вода",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": { "@type": "Product", "name": "Дистиллированная вода 1.5 л" },
+                "price": "30000",
+                "priceCurrency": "UZS"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": { "@type": "Product", "name": "Дистиллированная вода 3 л" },
+                "price": "58000",
+                "priceCurrency": "UZS"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": { "@type": "Product", "name": "Дистиллированная вода 5 л" },
+                "price": "65000",
+                "priceCurrency": "UZS"
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": { "@type": "Product", "name": "Дистиллированная вода 10 л" },
+                "price": "85000",
+                "priceCurrency": "UZS"
+              }
+            ]
+          }
         })}} />
       </head>
       <body>{children}</body>
