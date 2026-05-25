@@ -378,11 +378,29 @@ export default function Home() {
                   <div className="form-note">Свяжемся в Telegram в течение часа</div>
                 </>
               ) : (
-                <div className="success-box">
-                  <h3>✅ Заявка принята!</h3>
-                  <p>Мы свяжемся с вами в Telegram в течение часа для подтверждения заказа.</p>
-                </div>
-              )}
+  <div className="success-box">
+    <h3>✅ Заявка принята!</h3>
+    <div style={{margin:'16px 0',padding:'14px',background:'#E8F4FD',borderRadius:'12px',textAlign:'center'}}>
+      <div style={{fontSize:'13px',color:'#5A7090',marginBottom:'6px'}}>Номер вашего заказа</div>
+      <div style={{fontSize:'28px',fontWeight:'800',color:'#0F4F85',letterSpacing:'2px',marginBottom:'10px'}}>{orderNum}</div>
+      <button
+        onClick={()=>{navigator.clipboard.writeText(orderNum);alert('Номер скопирован!')}}
+        style={{background:'white',border:'1.5px solid #BEDAF5',borderRadius:'50px',padding:'6px 16px',fontSize:'13px',fontWeight:'700',color:'#1A6FB0',cursor:'pointer',marginBottom:'12px'}}
+      >
+        Скопировать номер
+      </button>
+    </div>
+    
+      href={'https://t.me/aquadomm_bot'}
+      target="_blank"
+      rel="noopener"
+      style={{display:'block',background:'#1A6FB0',color:'white',padding:'13px',borderRadius:'50px',textAlign:'center',fontWeight:'800',fontSize:'15px',textDecoration:'none',marginTop:'8px'}}
+    >
+      Отслеживать заказ в Telegram
+    </a>
+    <p style={{fontSize:'12px',color:'#5A7090',marginTop:'10px',textAlign:'center'}}>Нажмите кнопку выше и введите номер заказа в боте</p>
+  </div>
+)}
             </>
           )}
         </div>
