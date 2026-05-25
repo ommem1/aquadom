@@ -82,7 +82,6 @@ ${telegram ? `📱 *Telegram:* ${telegram}` : ''}
           body: JSON.stringify({
             chat_id: telegram,
             text: `💧 *AquaDom — заказ принят!*\n\nЗдравствуйте, ${name}!\nВаш заказ *#${orderNum}* получен.\n\n📦 ${size} л · ${freq}\n📍 ${city}, ${address}\n\nМы свяжемся с вами в течение часа. Спасибо! 🏠`,
-            parse_mode: 'Markdown'
           })
         })
       } catch (e) {}
