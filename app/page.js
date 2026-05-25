@@ -369,7 +369,7 @@ export default function Home() {
                   <div className="fg">
                     <label>Telegram (для уведомлений о статусе)</label>
                     <input value={form.telegram} onChange={e=>setForm({...form,telegram:e.target.value})} placeholder="@username"/>
-                    <div className="tg-hint">Начните диалог с ботом: <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener">t.me/aquadomm_bot</a></div>
+                    <div className="tg-hint">Начните диалог с ботом: <a href="https://t.me/AquaDomBot" target="_blank" rel="noopener">t.me/AquaDomBot</a></div>
                   </div>
                   {error && <div className="err">{error}</div>}
                   <button className="submit" onClick={handleSubmit} disabled={loading}>
@@ -378,23 +378,22 @@ export default function Home() {
                   <div className="form-note">Свяжемся в Telegram в течение часа</div>
                 </>
               ) : (
- ) : (
-  <div className="success-box">
-    <h3>Заявка принята!</h3>
-    <div style={{margin:'16px 0',padding:'14px',background:'#E8F4FD',borderRadius:'12px',textAlign:'center'}}>
-      <div style={{fontSize:'13px',color:'#5A7090',marginBottom:'6px'}}>Номер вашего заказа</div>
-      <div style={{fontSize:'28px',fontWeight:'800',color:'#0F4F85',letterSpacing:'2px',marginBottom:'10px'}}>{orderNum}</div>
-      <button onClick={()=>{navigator.clipboard.writeText(orderNum);alert('Скопировано!')}} style={{background:'white',border:'1.5px solid #BEDAF5',borderRadius:'50px',padding:'6px 16px',fontSize:'13px',fontWeight:'700',color:'#1A6FB0',cursor:'pointer'}}>
-        Скопировать номер
-      </button>
-    </div>
-    <a href={'https://t.me/aquadomm_bot'} style={{display:'block',background:'#1A6FB0',color:'white',padding:'13px',borderRadius:'50px',textAlign:'center',fontWeight:'800',fontSize:'15px',textDecoration:'none',marginTop:'8px'}}>
-      Отслеживать заказ в Telegram
-    </a>
-    <p style={{fontSize:'12px',color:'#5A7090',marginTop:'10px',textAlign:'center'}}>Нажмите кнопку выше и введите номер заказа в боте</p>
-  </div>
-)} 
-  </>
+                <div className="success-box">
+                  <h3>✅ Заявка принята!</h3>
+                  <div style={{margin:'16px 0',padding:'16px',background:'#E8F4FD',borderRadius:'12px',textAlign:'center'}}>
+                    <div style={{fontSize:'13px',color:'#5A7090',marginBottom:'6px'}}>Номер вашего заказа</div>
+                    <div style={{fontSize:'32px',fontWeight:'800',color:'#0F4F85',letterSpacing:'3px',marginBottom:'12px'}}>{orderNum}</div>
+                    <button onClick={()=>{navigator.clipboard.writeText(orderNum).then(()=>alert('Номер скопирован!'))}} style={{background:'white',border:'1.5px solid #BEDAF5',borderRadius:'50px',padding:'8px 20px',fontSize:'13px',fontWeight:'700',color:'#1A6FB0',cursor:'pointer'}}>
+                      Скопировать номер
+                    </button>
+                  </div>
+                  <a href="https://t.me/aquadomm_bot" style={{display:'block',background:'#1A6FB0',color:'white',padding:'14px',borderRadius:'50px',textAlign:'center',fontWeight:'800',fontSize:'15px',textDecoration:'none',marginTop:'8px'}}>
+                    Отслеживать заказ в Telegram
+                  </a>
+                  <p style={{fontSize:'12px',color:'#5A7090',marginTop:'10px'}}>Нажмите кнопку выше и введите номер заказа в боте</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
@@ -412,7 +411,7 @@ export default function Home() {
               <span className="b2b-tag">🏥 Медучреждения</span>
             </div>
           </div>
-          <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener" className="b2b-btn">
+          <a href="https://t.me/AquaDomBot" target="_blank" rel="noopener" className="b2b-btn">
             Написать в Telegram →
           </a>
         </div>
@@ -422,7 +421,7 @@ export default function Home() {
         <div className="fl">💧 AquaDom</div>
         <div className="fsub">Дистиллированная вода для техники · Не для питья</div>
         <div className="fc">
-          <span>📱 @aquadomm_bot</span>
+          <span>📱 @AquaDomBot</span>
           <span>📍 Весь Узбекистан</span>
           <span>🌐 aquadom.uz</span>
         </div>
