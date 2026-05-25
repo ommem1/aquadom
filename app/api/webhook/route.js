@@ -22,9 +22,24 @@ export async function POST(request) {
 
     const text = message?.text || ''
     const chatId = message?.chat?.id
+    const chatType = message?.chat?.type
+    const ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID
 
-    if (text === '/start' || text === '/help') {
-      await sendTelegram(chatId, `💧 *AquaDom — Управление заказами*\n\nКоманды:\n\`/принят 314585\`\n\`/в_пути 314585\`\n\`/доставлен 314585\`\n\`/отменён 314585\``)
+    // Личное сообщение клиенту — только приветствие
+    if (chatType === 'private') {
+      if (text === '/start') {
+        await sendTelegram(chatId, `💧 *AquaDom*\n\nЗдесь вы будете получать уведомления о статусе вашего заказа.\n\nДля заказа воды: [aquadom.uz](https://aquadom.uz)\n\nЕсть вопросы? Напишите нам @aquadomm_bot`)
+      }
+      return Response.json({ ok: true })
+    }
+
+    // Групповые команды — только для админ группы
+    if (String(chatId) !== String(ADMIN_CHAT_ID)) {
+      return Response.json({ ok: true })
+    }
+
+    if (text === '/help') {
+      await sendTelegram(chatId, `💧 *AquaDom — Управление заказами*\n\nКоманды:\n\`/принят НОМЕР\`\n\`/в_пути НОМЕР\`\n\`/доставлен НОМЕР\`\n\`/отменён НОМЕР\``)
       return Response.json({ ok: true })
     }
 
@@ -35,6 +50,18 @@ export async function POST(request) {
     if (STATUSES[cmd]) {
       if (!orderNum) {
         await sendTelegram(chatId, `⚠️ Укажи номер заказа. Пример: \`${cmd} 314585\``)
+        return Response.json({ ok: true })
+      }
+      const status = STATUSES[cmd]
+      await sendTelegram(chatId, `${status.emoji} Заказ *#${orderNum}* → *${status.text}*`)
+      return Response.json({ ok: true })
+    }
+
+    return Response.json({ ok: true })
+  } catch (error) {
+    return Response.json({ ok: true })
+  }
+}        await sendTelegram(chatId, `⚠️ Укажи номер заказа. Пример: \`${cmd} 314585\``)
         return Response.json({ ok: true })
       }
       const status = STATUSES[cmd]
