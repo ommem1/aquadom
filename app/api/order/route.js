@@ -41,28 +41,27 @@ export async function POST(request) {
 
     // Сообщение для группы
     const adminMsg = `
-🆕 *НОВЫЙ ЗАКАЗ #${orderNum}*
+НОВЫЙ ЗАКАЗ #${orderNum}
 
-👤 *Клиент:* ${name}
-📞 *Телефон:* ${phone}
-📍 *Город:* ${city}
-🏠 *Адрес:* ${address}
-${telegram ? `📱 *Telegram:* ${telegram}` : ''}
+Клиент: ${name}
+Телефон: ${phone}
+Город: ${city}
+Адрес: ${address}
+${telegram ? `Telegram: ${telegram}` : ''}
 
-💧 *Объём:* ${size} л
-🔄 *Частота:* ${freq}
-📅 *Срок:* ${dur}
-📦 *Доставок:* ${deliveries}
-💰 *Итого:* ${total}
+Объём: ${size} л
+Частота: ${freq}
+Срок: ${dur}
+Доставок: ${deliveries}
+Итого: ${total}
 
-⏰ ${now}
+${now}
 
-─────────────────
 Команды статуса:
 /принят ${orderNum}
 /в_пути ${orderNum}
 /доставлен ${orderNum}
-    `.trim()
+`.trim()
 
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
