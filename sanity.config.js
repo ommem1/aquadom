@@ -7,6 +7,7 @@ export default defineConfig({
   title: 'AquaDom',
   projectId: 'u9a9j56i',
   dataset: 'production',
+  basePath: '/studio',
   plugins: [structureTool()],
   schema: {
     types: schemaTypes,
