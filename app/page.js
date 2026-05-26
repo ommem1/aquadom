@@ -1,53 +1,97 @@
 'use client'
 import { useState } from 'react'
 
-const PRICES = { '1.5': 30000, '3': 58000, '5': 65000, '10': 85000 }
-const FREQ_LABELS = { '7': 'Раз в неделю', '14': 'Раз в 2 недели', '30': 'Раз в месяц', '90': 'Раз в 3 месяца' }
-const DUR_LABELS = { '7': '1 неделя', '30': '1 месяц', '90': '3 месяца', '180': '6 месяцев', '365': '1 год' }
-const DISCOUNTS = { '7': 0, '30': 0, '90': 0.05, '180': 0.10, '365': 0.15 }
+const PHONE = '+998901860128'
+const PHONE_DISPLAY = '+998 90 186 01 28'
+const TG = 'https://t.me/aquadomm_bot'
 
-function fmt(n) { return n.toLocaleString('ru') + ' сум' }
+const PRODUCTS = [
+  { icon: '💧', name: 'Дистиллированная вода', desc: 'Стандартная дистилляция. ГОСТ. pH = 0. Для увлажнителей, утюгов, аккумуляторов и радиаторов.' },
+  { icon: '⚗️', name: 'Двойная дистилляция', desc: 'Повышенная степень очистки. Минимум примесей. Для чувствительного оборудования.' },
+  { icon: '🔬', name: 'Тройная дистилляция', desc: 'Максимальная чистота. Для лабораторий, медицины и прецизионного оборудования.' },
+  { icon: '⚡', name: 'Электролит', desc: 'Специальный состав для обслуживания автомобильных и промышленных аккумуляторов.' },
+  { icon: '🥈', name: 'Вода с ионами серебра', desc: 'Антибактериальный эффект. Для увлажнителей и специального применения.' },
+  { icon: '📦', name: 'Оптом от 100 л', desc: 'Для производств, прачечных, автосервисов. Оплата по безналу, счёт-фактура.' },
+]
+
+const WHY = [
+  { icon: '🏭', title: 'Собственное производство', text: 'Мы производитель, не перекупщик. Полный контроль качества от дистилляции до розлива.' },
+  { icon: '🏅', title: 'Соответствие ГОСТ', text: 'Вся продукция соответствует государственному стандарту качества.' },
+  { icon: '🧪', title: 'pH = 0 — абсолютная чистота', text: 'Ноль примесей, солей и органики. Это наш стандарт для каждой партии.' },
+  { icon: '🚚', title: 'Доставка по всему Узбекистану', text: 'По Ташкенту — своя курьерская служба. По регионам — партнёрские курьерские компании.' },
+]
+
+function Header() {
+  return (
+    <header style={{
+      position: 'sticky', top: 0, zIndex: 100,
+      background: 'white', borderBottom: '1px solid #E5EEF8',
+    }}>
+      <div style={{
+        maxWidth: 1200, margin: '0 auto', padding: '12px 24px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+      }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <svg width="34" height="34" viewBox="0 0 92 92" fill="none">
+            <path d="M46 5C20 27 8 49 8 63C8 77 25 90 46 90C67 90 84 77 84 63C84 49 72 27 46 5Z" fill="#1A6FB0"/>
+            <ellipse cx="30" cy="32" rx="8" ry="4" fill="white" opacity="0.18" transform="rotate(-25,30,32)"/>
+            <polygon points="32,55 46,40 60,55" fill="white"/>
+            <rect x="32" y="54" width="28" height="22" fill="white"/>
+            <rect x="40" y="64" width="12" height="12" rx="3" fill="#1A6FB0"/>
+            <rect x="34" y="58" width="7" height="6" rx="1" fill="#BEDAF5"/>
+          </svg>
+          <div>
+            <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.5px' }}>
+              <span style={{ fontWeight: 300, color: '#1A6FB0' }}>Aqua</span>
+              <span style={{ color: '#0F4F85' }}>Dom</span>
+            </div>
+            <div style={{ fontSize: 10, color: '#5A7090', marginTop: 2 }}>Дистиллированная вода</div>
+          </div>
+        </a>
+
+        <nav style={{ display: 'flex', gap: 24, alignItems: 'center' }} className="hdr-nav">
+          <a href="/" style={{ fontSize: 14, fontWeight: 600, color: '#1A6FB0', textDecoration: 'none' }}>Главная</a>
+          <a href="/catalog" style={{ fontSize: 14, fontWeight: 600, color: '#5A7090', textDecoration: 'none' }}>Каталог</a>
+        </nav>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <a href={`tel:${PHONE}`} className="hdr-phone" style={{
+            fontSize: 14, fontWeight: 700, color: '#1A2332', textDecoration: 'none',
+          }}>{PHONE_DISPLAY}</a>
+          <a href={TG} target="_blank" rel="noopener" style={{
+            background: '#1A6FB0', color: 'white', padding: '9px 20px',
+            borderRadius: 50, fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
+          }}>Telegram</a>
+        </div>
+      </div>
+    </header>
+  )
+}
 
 export default function Home() {
-  const [size, setSize] = useState(null)
-  const [freq, setFreq] = useState(null)
-  const [dur, setDur] = useState(null)
-  const [form, setForm] = useState({ name: '', phone: '+998', city: 'Ташкент', address: '', telegram: '' })
+  const [form, setForm] = useState({ name: '', phone: '+998', message: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [confirmedOrderNum, setConfirmedOrderNum] = useState('')
   const [error, setError] = useState('')
 
-  const deliveries = size && freq && dur ? Math.floor(parseInt(dur) / parseInt(freq)) : 0
-  const validCombo = deliveries >= 1
-  const discount = dur ? DISCOUNTS[dur] || 0 : 0
-  const pricePerDel = size ? Math.round(PRICES[size] * (1 - discount)) : 0
-  const total = pricePerDel * deliveries
-  const saved = size ? Math.round(PRICES[size] * discount * deliveries) : 0
-  const showSummary = size && freq && dur && validCombo
-
-  const handleSubmit = async () => {
-    if (!form.name || !form.phone || !form.address) {
-      setError('Заполните имя, телефон и адрес')
+  const submit = async () => {
+    if (!form.name || form.phone.length < 9) {
+      setError('Введите имя и номер телефона')
       return
     }
-    setError('')
     setLoading(true)
+    setError('')
     try {
-      const res = await fetch('/api/order', {
+      const res = await fetch('/api/callback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          size, freq: FREQ_LABELS[freq], dur: DUR_LABELS[dur],
-          deliveries, total: fmt(total), price: fmt(pricePerDel)
-        })
+        body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (data.success) { setSuccess(true); setConfirmedOrderNum(data.orderNum || '') }
-      else setError('Ошибка отправки. Напишите нам в Telegram.')
+      if (data.success) setSuccess(true)
+      else setError('Ошибка. Напишите нам в Telegram.')
     } catch {
-      setError('Ошибка сети. Напишите нам в Telegram.')
+      setError('Ошибка сети. Попробуйте ещё раз.')
     }
     setLoading(false)
   }
@@ -55,388 +99,366 @@ export default function Home() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;800&display=swap');
-        :root{--blue:#1A6FB0;--bd:#0F4F85;--bl:#E8F4FD;--bm:#BEDAF5;--cr:#F7F9FC;--tx:#1A2332;--mu:#5A7090;--wh:#fff;--gl:#E6F7EE;--r:14px;}
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:'Nunito',sans-serif;background:var(--cr);color:var(--tx);}
-        nav{background:var(--wh);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E5EEF8;position:sticky;top:0;z-index:100;}
-        .logo{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:800;color:var(--bd);text-decoration:none;}
-        .nav-cta{background:var(--blue);color:white;border:none;padding:8px 18px;border-radius:50px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
-        .warn-bar{background:#FFF3CD;border-bottom:1px solid #FFE082;padding:9px 24px;text-align:center;font-size:12px;color:#7B5800;font-weight:600;}
-        .hero{padding:44px 24px 32px;text-align:center;max-width:640px;margin:0 auto;}
-        .hero-badge{display:inline-flex;align-items:center;gap:6px;background:#FFF8E1;color:#7B5800;font-size:12px;font-weight:700;padding:5px 13px;border-radius:50px;margin-bottom:16px;border:1px solid #FFE082;}
-        h1{font-size:36px;font-weight:800;line-height:1.15;margin-bottom:12px;letter-spacing:-1px;}
-        h1 span{color:var(--blue);}
-        .hero p{font-size:15px;color:var(--mu);margin-bottom:26px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;}
-        .hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-        .btn-p{background:var(--blue);color:white;border:none;padding:12px 24px;border-radius:50px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(26,111,176,0.3);}
-        .btn-p:hover{background:var(--bd);}
-        .btn-s{background:var(--wh);color:var(--blue);border:2px solid var(--bm);padding:12px 24px;border-radius:50px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
-        .trust{background:var(--wh);padding:16px 24px;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;border-bottom:1px solid #E5EEF8;}
-        .ti{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mu);font-weight:600;}
-        section{padding:40px 24px;max-width:640px;margin:0 auto;}
-        .sl{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;}
-        .st{font-size:24px;font-weight:800;margin-bottom:5px;letter-spacing:-0.5px;}
-        .ss{font-size:14px;color:var(--mu);margin-bottom:22px;}
-        .use-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;}
-        .uc{background:var(--wh);border:1px solid #E5EEF8;border-radius:var(--r);padding:16px 12px;text-align:center;}
-        .uc-icon{font-size:28px;margin-bottom:8px;}
-        .uc-name{font-size:13px;font-weight:700;margin-bottom:3px;}
-        .uc-desc{font-size:11px;color:var(--mu);line-height:1.5;}
-        .why-box{background:var(--wh);border-radius:var(--r);border:1px solid #E5EEF8;padding:18px;margin-bottom:10px;display:flex;gap:13px;align-items:flex-start;}
-        .wi{font-size:20px;min-width:34px;height:34px;background:var(--bl);border-radius:9px;display:flex;align-items:center;justify-content:center;}
-        .wt{font-size:13px;font-weight:700;margin-bottom:2px;}
-        .wd{font-size:12px;color:var(--mu);line-height:1.5;}
-        .steps{display:flex;flex-direction:column;gap:10px;}
-        .step{background:var(--wh);border-radius:var(--r);padding:16px 18px;display:flex;gap:14px;border:1px solid #E5EEF8;}
-        .sn{min-width:34px;height:34px;background:var(--bl);color:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
-        .stit{font-size:13px;font-weight:700;margin-bottom:2px;}
-        .sdesc{font-size:12px;color:var(--mu);}
-        .calc-wrap{background:var(--wh);border-radius:20px;border:1px solid #E5EEF8;padding:24px;}
-        .clabel{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:9px;}
-        .og{display:grid;gap:8px;margin-bottom:20px;}
-        .og.c4{grid-template-columns:repeat(4,1fr);}
-        .og.c2{grid-template-columns:1fr 1fr;}
-        .opt{background:var(--cr);border:2px solid #E5EEF8;border-radius:var(--r);padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.15s;user-select:none;}
-        .opt:hover{border-color:var(--bm);}
-        .opt.sel{border-color:var(--blue);background:var(--bl);}
-        .om{font-size:14px;font-weight:800;}
-        .opt.sel .om{color:var(--bd);}
-        .os{font-size:10px;color:var(--mu);margin-top:2px;}
-        .op{font-size:11px;font-weight:700;color:var(--blue);margin-top:3px;}
-        .ob{display:inline-block;font-size:9px;font-weight:800;background:#FFF3CD;color:#856404;padding:2px 7px;border-radius:20px;margin-top:3px;}
-        .opt.sel .ob{background:var(--blue);color:white;}
-        .disc-strip{background:var(--bl);border-radius:10px;padding:9px 13px;margin-bottom:18px;font-size:12px;color:var(--bd);}
-        .warn-combo{background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:10px 13px;font-size:12px;color:#7B5800;margin-bottom:14px;}
-        .summary-box{background:var(--bl);border:2px solid var(--bm);border-radius:var(--r);padding:18px;margin-bottom:14px;}
-        .sum-title{font-size:10px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
-        .sr{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;}
-        .sr span:first-child{color:var(--mu);}
-        .sr span:last-child{font-weight:700;}
-        .sdiv{height:1px;background:var(--bm);margin:10px 0;}
-        .tot-row{display:flex;justify-content:space-between;align-items:flex-end;}
-        .tot-label{font-size:14px;font-weight:700;}
-        .tot-price{font-size:24px;font-weight:800;color:var(--bd);}
-        .tot-note{font-size:11px;color:var(--mu);text-align:right;}
-        .saving{display:inline-block;background:var(--gl);color:#1A8F5A;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-top:5px;}
-        .rem-info{background:var(--gl);border:1px solid #A8DFC0;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#0F5A38;line-height:1.7;}
-        .fg{margin-bottom:12px;}
-        .fg label{display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:4px;}
-        .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-        input,select{width:100%;font-family:inherit;font-size:13px;padding:10px 12px;border:1.5px solid #E5EEF8;border-radius:11px;outline:none;background:var(--cr);color:var(--tx);transition:border 0.2s;}
-        input:focus,select:focus{border-color:var(--blue);background:white;}
-        .tg-hint{font-size:11px;color:var(--mu);margin-top:3px;}
-        .err{font-size:12px;color:#D85A30;margin-bottom:10px;padding:8px 12px;background:#FAECE7;border-radius:8px;}
-        .submit{width:100%;padding:14px;background:var(--blue);color:white;border:none;border-radius:50px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;box-shadow:0 4px 14px rgba(26,111,176,0.25);}
-        .submit:hover{background:var(--bd);}
-        .submit:disabled{background:#B0C8E0;cursor:default;box-shadow:none;}
-        .form-note{font-size:11px;color:var(--mu);text-align:center;margin-top:7px;}
-        .success-box{background:var(--gl);border:2px solid #A8DFC0;border-radius:var(--r);padding:24px;text-align:center;}
-        .success-box h3{font-size:18px;font-weight:800;color:#0F5A38;margin-bottom:8px;}
-        .success-box p{font-size:14px;color:#1A8F5A;}
-        .b2b-box{background:var(--bd);border-radius:var(--r);padding:22px;color:white;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
-        .b2b-title{font-size:16px;font-weight:800;margin-bottom:3px;}
-        .b2b-sub{font-size:12px;opacity:0.7;margin-bottom:8px;}
-        .b2b-tags{display:flex;gap:7px;flex-wrap:wrap;}
-        .b2b-tag{background:rgba(255,255,255,0.12);font-size:11px;padding:3px 10px;border-radius:50px;font-weight:600;}
-        .b2b-btn{background:white;color:var(--bd);border:none;padding:11px 20px;border-radius:50px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;text-decoration:none;}
-        footer{background:var(--bd);color:white;padding:24px;text-align:center;}
-        .fl{font-size:17px;font-weight:800;margin-bottom:5px;}
-        .fsub{font-size:11px;opacity:0.5;margin-bottom:12px;}
-        .fc{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:12px;opacity:0.7;}
-        @media(max-width:480px){
-          h1{font-size:28px;}
-          .og.c4{grid-template-columns:1fr 1fr;}
-          .frow{grid-template-columns:1fr;}
-          .b2b-box{flex-direction:column;}
-          .trust{gap:14px;}
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', -apple-system, sans-serif; background: #F7F9FC; color: #1A2332; }
+        a { text-decoration: none; }
+        a:hover { text-decoration: none; }
+
+        .hdr-nav a:hover { color: #1A6FB0 !important; }
+
+        .hero-badge-item + .hero-badge-item::before {
+          content: '·'; margin: 0 8px; opacity: 0.4;
+        }
+
+        .prod-card:hover { box-shadow: 0 10px 32px rgba(15,28,46,0.1); border-color: #BEDAF5 !important; }
+        .why-card:hover { box-shadow: 0 8px 24px rgba(15,28,46,0.07); }
+        .catalog-link:hover { background: #0F4F85 !important; }
+        .b2b-btn:hover { background: #E8F4FD !important; }
+        .sub-btn:hover:not(:disabled) { background: #0F4F85 !important; }
+        .ft-link:hover { color: white !important; }
+        .ft-contact:hover { color: white !important; }
+
+        input:focus, textarea:focus {
+          border-color: #1A6FB0 !important;
+          background: white !important;
+        }
+
+        @media (max-width: 900px) {
+          .prod-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 640px) {
+          .hero-h1 { font-size: 32px !important; letter-spacing: -1px !important; }
+          .hero-p { font-size: 15px !important; }
+          .prod-grid { grid-template-columns: 1fr !important; }
+          .why-grid { grid-template-columns: 1fr !important; }
+          .b2b-inner { flex-direction: column !important; }
+          .form-wrap { padding: 24px 16px !important; }
+          .sec-h { font-size: 24px !important; }
+          .hdr-phone { display: none !important; }
+          .ft-top { flex-direction: column !important; gap: 28px !important; }
+        }
+        @media (max-width: 420px) {
+          .hero-h1 { font-size: 26px !important; }
+          .hero-sec { padding: 56px 16px !important; }
+          .hdr-nav { display: none !important; }
         }
       `}</style>
 
-      {/* NAV */}
-      <nav>
-        <a href="/" className="logo">
-          <svg width="30" height="30" viewBox="0 0 84 90" fill="none">
-            <path d="M42 5C20 27 8 49 8 63C8 77 24 90 42 90C60 90 76 77 76 63C76 49 64 27 42 5Z" fill="#1A6FB0"/>
-            <polygon points="28,57 42,42 56,57" fill="white"/>
-            <rect x="28" y="56" width="28" height="22" fill="white"/>
-            <rect x="37" y="65" width="12" height="13" rx="3" fill="#1A6FB0"/>
-          </svg>
-          AquaDom
-        </a>
-        <button className="nav-cta" onClick={() => document.getElementById('order').scrollIntoView({behavior:'smooth'})}>
-          Заказать
-        </button>
-      </nav>
+      <Header />
 
-      <div className="warn-bar">
+      {/* WARN */}
+      <div style={{
+        background: '#FFF3CD', borderBottom: '1px solid #FFE082',
+        padding: '8px 24px', textAlign: 'center', fontSize: 12, color: '#7B5800', fontWeight: 600,
+      }}>
         ⚠️ Дистиллированная вода — <strong>не для питья</strong>. Только для технических нужд.
       </div>
 
       {/* HERO */}
-      <div className="hero">
-        <div className="hero-badge">🔬 Дистиллированная вода · ГОСТ</div>
-        <h1>Вода для техники —<br/><span>не для питья</span></h1>
-        <p>Для увлажнителей, утюгов, аккумуляторов и радиаторов. Доставка по всему Узбекистану.</p>
-        <div className="hero-btns">
-          <button className="btn-p" onClick={() => document.getElementById('order').scrollIntoView({behavior:'smooth'})}>
-            Оформить доставку
-          </button>
-          <button className="btn-s" onClick={() => document.getElementById('use').scrollIntoView({behavior:'smooth'})}>
-            Для чего нужна?
-          </button>
+      <section className="hero-sec" style={{
+        background: 'linear-gradient(150deg, #0D2547 0%, #1A5C96 55%, #1A6FB0 100%)',
+        padding: '80px 24px', textAlign: 'center', color: 'white',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center',
+            background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: 50, padding: '7px 20px', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', gap: 0,
+          }}>
+            <span className="hero-badge-item">🏭 Производитель</span>
+            <span className="hero-badge-item">🏅 ГОСТ</span>
+            <span className="hero-badge-item">🧪 pH = 0</span>
+          </div>
         </div>
-      </div>
 
-      <div className="trust">
-        <div className="ti">✅ 100% дистиллят</div>
-        <div className="ti">🚚 Весь Узбекистан</div>
-        <div className="ti">🔄 Подписка или разово</div>
-        <div className="ti">📦 Тара в комплекте</div>
-      </div>
+        <h1 className="hero-h1" style={{
+          fontSize: 52, fontWeight: 900, lineHeight: 1.08,
+          letterSpacing: '-2px', marginBottom: 16,
+          maxWidth: 680, marginLeft: 'auto', marginRight: 'auto',
+        }}>
+          Дистиллированная вода<br/>для техники
+        </h1>
 
-      {/* USE CASES */}
-      <section id="use">
-        <div className="sl">Применение</div>
-        <div className="st">Для чего нужна дистиллированная вода?</div>
-        <div className="ss">Обычная вода содержит соли — они разрушают технику. Дистиллят — нет.</div>
-        <div className="use-grid">
-          {[
-            {icon:'💨',name:'Увлажнители',desc:'Нет накипи и белого налёта'},
-            {icon:'👕',name:'Утюги',desc:'Паровая подошва не засоряется'},
-            {icon:'🚗',name:'Аккумуляторы',desc:'Долив в авто и мото'},
-            {icon:'🌡️',name:'Радиаторы',desc:'Охлаждение без коррозии'},
-            {icon:'🔬',name:'Лаборатории',desc:'Реактивы и анализы'},
-            {icon:'🐠',name:'Аквариумы',desc:'Контролируемый состав'},
-          ].map(u => (
-            <div key={u.name} className="uc">
-              <div className="uc-icon">{u.icon}</div>
-              <div className="uc-name">{u.name}</div>
-              <div className="uc-desc">{u.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+        <p className="hero-p" style={{
+          fontSize: 17, opacity: 0.75, maxWidth: 480,
+          margin: '0 auto 36px', lineHeight: 1.65,
+        }}>
+          Собственное производство. Для увлажнителей, утюгов, аккумуляторов и радиаторов.
+          Доставка по всему Узбекистану.
+        </p>
 
-      {/* WHY */}
-      <section style={{paddingTop:0}}>
-        <div className="sl">Почему дистиллят</div>
-        <div className="st">Чем отличается от обычной воды?</div>
-        {[
-          {icon:'⚗️',title:'0 примесей и солей',desc:'Дистилляция удаляет все минералы, хлор и органику. Чистота 99.9%.'},
-          {icon:'⚙️',title:'Техника служит дольше',desc:'Накипь в утюге или увлажнителе — главная причина поломок. Дистиллят исключает это.'},
-          {icon:'🚘',title:'Обязателен для авто',desc:'Производители прямо указывают: в аккумулятор и радиатор — только дистиллированная вода.'},
-        ].map(w => (
-          <div key={w.title} className="why-box">
-            <div className="wi">{w.icon}</div>
-            <div><div className="wt">{w.title}</div><div className="wd">{w.desc}</div></div>
-          </div>
-        ))}
-      </section>
-
-      {/* STEPS */}
-      <section style={{paddingTop:0}}>
-        <div className="sl">Как работает</div>
-        <div className="st">Три шага до доставки</div>
-        <div className="steps">
-          {[
-            {n:1,t:'Настройте объём и частоту',d:'1.5, 3, 5 или 10 литров. Разово или подписка.'},
-            {n:2,t:'Оставьте заявку',d:'Мы свяжемся в Telegram в течение часа для подтверждения.'},
-            {n:3,t:'Получите с уведомлением',d:'За день до доставки придёт напоминание в Telegram.'},
-          ].map(s => (
-            <div key={s.n} className="step">
-              <div className="sn">{s.n}</div>
-              <div><div className="stit">{s.t}</div><div className="sdesc">{s.d}</div></div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ORDER + CALCULATOR */}
-      <section id="order" style={{paddingTop:0}}>
-        <div className="sl">Заказ</div>
-        <div className="st">Оформить доставку</div>
-        <div className="ss">Настройте подписку — калькулятор посчитает итог</div>
-
-        <div className="calc-wrap">
-          {/* STEP 1 */}
-          <div className="clabel">Шаг 1 — Объём тары</div>
-          <div className="og c4">
-            {[
-              {v:'1.5',label:'1.5 л',sub:'Утюги, небольшие увлажнители',price:'30 000'},
-              {v:'3',  label:'3 л',  sub:'Увлажнители, аккумуляторы',  price:'58 000'},
-              {v:'5',  label:'5 л',  sub:'Авто + техника дома',         price:'65 000'},
-              {v:'10', label:'10 л', sub:'СТО, большой запас',          price:'85 000'},
-            ].map(o => (
-              <div key={o.v} className={`opt${size===o.v?' sel':''}`} onClick={()=>setSize(o.v)}>
-                <div className="om">{o.label}</div>
-                <div className="os">{o.sub}</div>
-                <div className="op">{o.price} сум</div>
-              </div>
-            ))}
-          </div>
-
-          {/* STEP 2 */}
-          <div className="clabel">Шаг 2 — Частота доставки</div>
-          <div className="og c2">
-            {[
-              {v:'7', l:'Раз в неделю',    s:'Каждые 7 дней'},
-              {v:'14',l:'Раз в 2 недели',  s:'Каждые 14 дней'},
-              {v:'30',l:'Раз в месяц',     s:'Каждые 30 дней'},
-              {v:'90',l:'Раз в 3 месяца',  s:'Каждые 90 дней'},
-            ].map(o => (
-              <div key={o.v} className={`opt${freq===o.v?' sel':''}`} onClick={()=>setFreq(o.v)}>
-                <div className="om">{o.l}</div>
-                <div className="os">{o.s}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* STEP 3 */}
-          <div className="clabel">Шаг 3 — Срок подписки</div>
-          <div className="disc-strip">💡 Скидки: <strong>3 мес → −5%</strong> · <strong>6 мес → −10%</strong> · <strong>1 год → −15%</strong></div>
-          <div className="og c2">
-            {[
-              {v:'7',  l:'1 неделя',  s:'Попробовать', disc:null},
-              {v:'30', l:'1 месяц',   s:'30 дней',     disc:null},
-              {v:'90', l:'3 месяца',  s:null,           disc:'−5%'},
-              {v:'180',l:'6 месяцев', s:null,           disc:'−10%'},
-              {v:'365',l:'1 год',     s:null,           disc:'−15%'},
-            ].map(o => (
-              <div key={o.v} className={`opt${dur===o.v?' sel':''}`} onClick={()=>setDur(o.v)}>
-                <div className="om">{o.l}</div>
-                {o.s && <div className="os">{o.s}</div>}
-                {o.disc && <div className="ob">{o.disc}</div>}
-              </div>
-            ))}
-          </div>
-
-          {/* WARN */}
-          {size && freq && dur && !validCombo && (
-            <div className="warn-combo">⚠️ При выбранной частоте за этот срок будет меньше 1 доставки. Выберите другую комбинацию.</div>
-          )}
-
-          {/* SUMMARY */}
-          {showSummary && (
-            <>
-              <div className="summary-box">
-                <div className="sum-title">Ваша подписка</div>
-                <div className="sr"><span>Объём</span><span>{size} л</span></div>
-                <div className="sr"><span>Цена за доставку</span><span>{fmt(pricePerDel)}{discount>0?` (−${discount*100}%)`:''}</span></div>
-                <div className="sr"><span>Частота</span><span>{FREQ_LABELS[freq]}</span></div>
-                <div className="sr"><span>Срок</span><span>{DUR_LABELS[dur]}</span></div>
-                <div className="sr"><span>Количество доставок</span><span>{deliveries} {deliveries===1?'доставка':deliveries<5?'доставки':'доставок'}</span></div>
-                <div className="sdiv"/>
-                <div className="tot-row">
-                  <div className="tot-label">Итого</div>
-                  <div style={{textAlign:'right'}}>
-                    <div className="tot-price">{fmt(total)}</div>
-                    <div className="tot-note">{fmt(pricePerDel)} / доставка</div>
-                    {saved>0 && <div className="saving">Экономия {fmt(saved)}</div>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="rem-info">
-                🔔 <strong>Автонапоминания включены.</strong> За день до каждой доставки вы получите уведомление в Telegram.
-              </div>
-
-              {/* FORM */}
-              {!success ? (
-                <>
-                  <div className="clabel" style={{marginTop:4}}>Шаг 4 — Ваши данные</div>
-                  <div className="frow">
-                    <div className="fg" style={{marginBottom:0}}>
-                      <label>Имя</label>
-                      <input
-                        value={form.name}
-                        onChange={e => setForm({...form, name: e.target.value})}
-                        placeholder="Алишер"
-                      />
-                    </div>
-                    <div className="fg" style={{marginBottom:0}}>
-                      <label>Телефон</label>
-                      <input
-                        value={form.phone}
-                        onChange={e => {
-                          const val = e.target.value
-                          if (val.startsWith('+998')) setForm({...form, phone: val})
-                        }}
-                        placeholder="+998 90 000 00 00"
-                        type="tel"
-                      />
-                    </div>
-                  </div>
-                  <div className="fg">
-                    <label>Город</label>
-                    <select value={form.city} onChange={e=>setForm({...form,city:e.target.value})}>
-                      {['Ташкент','Самарканд','Бухара','Наманган','Андижан','Фергана','Другой'].map(c=>(
-                        <option key={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="fg">
-                    <label>Адрес доставки</label>
-                    <input value={form.address} onChange={e=>setForm({...form,address:e.target.value})} placeholder="Улица, дом, квартира"/>
-                  </div>
-                  <div className="fg">
-                    <label>Telegram (для уведомлений о статусе)</label>
-                    <input value={form.telegram} onChange={e=>setForm({...form,telegram:e.target.value})} placeholder="@username"/>
-                    <div className="tg-hint">Начните диалог с ботом: <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener">t.me/aquadomm_bot</a></div>
-                  </div>
-                  {error && <div className="err">{error}</div>}
-                  <button className="submit" onClick={handleSubmit} disabled={loading}>
-                    {loading ? 'Отправляем...' : 'Оформить подписку →'}
-                  </button>
-                  <div className="form-note">Свяжемся в Telegram в течение часа</div>
-                </>
-              ) : (
-                <div className="success-box">
-                  <h3>✅ Заявка принята!</h3>
-                  <div style={{margin:'16px 0',padding:'16px',background:'#E8F4FD',borderRadius:'12px',textAlign:'center'}}>
-                    <div style={{fontSize:'13px',color:'#5A7090',marginBottom:'6px'}}>Номер вашего заказа</div>
-                    <div style={{fontSize:'32px',fontWeight:'800',color:'#0F4F85',letterSpacing:'3px',marginBottom:'12px'}}>{confirmedOrderNum}</div>
-                    <button onClick={()=>{const el=document.createElement('input');el.value=confirmedOrderNum;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);alert('Номер скопирован!');}} style={{background:'white',border:'1.5px solid #BEDAF5',borderRadius:'50px',padding:'8px 20px',fontSize:'13px',fontWeight:'700',color:'#1A6FB0',cursor:'pointer'}}>
-                      Скопировать номер
-                    </button>
-                  </div>
-                  <a href="https://t.me/aquadomm_bot" style={{display:'block',background:'#1A6FB0',color:'white',padding:'14px',borderRadius:'50px',textAlign:'center',fontWeight:'800',fontSize:'15px',textDecoration:'none',marginTop:'8px'}}>
-                    Отслеживать заказ в Telegram
-                  </a>
-                  <p style={{fontSize:'12px',color:'#5A7090',marginTop:'10px'}}>Нажмите кнопку выше и введите номер заказа в боте</p>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* B2B */}
-      <section style={{paddingTop:0}}>
-        <div className="b2b-box">
-          <div>
-            <div className="b2b-title">Для бизнеса — отдельные условия</div>
-            <div className="b2b-sub">Крупные объёмы, счёт-фактура, персональный менеджер</div>
-            <div className="b2b-tags">
-              <span className="b2b-tag">🔧 СТО</span>
-              <span className="b2b-tag">🔬 Лаборатории</span>
-              <span className="b2b-tag">🏭 Предприятия</span>
-              <span className="b2b-tag">🏥 Медучреждения</span>
-            </div>
-          </div>
-          <a href="https://t.me/aquadomm_bot" target="_blank" rel="noopener" className="b2b-btn">
-            Написать в Telegram →
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a href="/catalog" style={{
+            background: 'white', color: '#0F4F85', padding: '14px 32px',
+            borderRadius: 50, fontSize: 15, fontWeight: 800, display: 'inline-block',
+          }}>
+            Смотреть каталог →
+          </a>
+          <a href={TG} target="_blank" rel="noopener" style={{
+            background: 'transparent', color: 'white',
+            border: '2px solid rgba(255,255,255,0.35)', padding: '14px 32px',
+            borderRadius: 50, fontSize: 15, fontWeight: 700, display: 'inline-block',
+          }}>
+            ✈ Написать в Telegram
           </a>
         </div>
       </section>
 
-      <footer>
-        <div className="fl">💧 AquaDom</div>
-        <div className="fsub">Дистиллированная вода для техники · Не для питья</div>
-        <div className="fc">
-          <span>📱 @aquadomm_bot</span>
-          <span>📍 Весь Узбекистан</span>
-          <span>🌐 aquadom.uz</span>
+      {/* TRUST STRIP */}
+      <div style={{ background: 'white', borderBottom: '1px solid #E5EEF8' }}>
+        <div style={{
+          maxWidth: 1100, margin: '0 auto', padding: '14px 24px',
+          display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap',
+        }}>
+          {[
+            ['🏭', 'Производитель'],
+            ['🏅', 'ГОСТ'],
+            ['🧪', 'pH = 0'],
+            ['🚚', 'Весь Узбекистан'],
+            ['🧾', 'Безнал для юрлиц'],
+          ].map(([icon, label]) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700 }}>
+              <span style={{ fontSize: 16 }}>{icon}</span>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* PRODUCTS */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }}>
+        <div style={{ fontSize: 11, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+          Продукция
+        </div>
+        <div className="sec-h" style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8 }}>
+          Что мы производим
+        </div>
+        <div style={{ fontSize: 15, color: '#5A7090', marginBottom: 40, lineHeight: 1.6 }}>
+          Вся линейка — от стандартной дистилляции до тройной очистки
+        </div>
+
+        <div className="prod-grid" style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32,
+        }}>
+          {PRODUCTS.map(p => (
+            <a key={p.name} href="/catalog" className="prod-card" style={{
+              background: 'white', border: '1px solid #E5EEF8', borderRadius: 16,
+              padding: 24, display: 'flex', flexDirection: 'column', gap: 8,
+              cursor: 'pointer', textDecoration: 'none', color: 'inherit',
+              transition: 'box-shadow 0.2s, border-color 0.2s',
+            }}>
+              <div style={{ fontSize: 36, marginBottom: 4 }}>{p.icon}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#1A2332' }}>{p.name}</div>
+              <div style={{ fontSize: 13, color: '#5A7090', lineHeight: 1.55 }}>{p.desc}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1A6FB0', marginTop: 'auto', paddingTop: 8 }}>
+                Смотреть товары →
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <a href="/catalog" className="catalog-link" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          background: '#1A6FB0', color: 'white', padding: '13px 28px',
+          borderRadius: 50, fontSize: 14, fontWeight: 800, textDecoration: 'none',
+          transition: 'background 0.2s',
+        }}>
+          Весь каталог с ценами →
+        </a>
+      </div>
+
+      {/* WHY US */}
+      <div style={{ background: 'white', borderTop: '1px solid #E5EEF8', borderBottom: '1px solid #E5EEF8' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+            Преимущества
+          </div>
+          <div className="sec-h" style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8 }}>
+            Почему выбирают AquaDom
+          </div>
+          <div style={{ fontSize: 15, color: '#5A7090', marginBottom: 40, lineHeight: 1.6 }}>
+            Мы не перекупщики — мы производим воду сами
+          </div>
+
+          <div className="why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+            {WHY.map(w => (
+              <div key={w.title} className="why-card" style={{
+                background: 'white', border: '1px solid #E5EEF8', borderRadius: 16,
+                padding: 24, display: 'flex', gap: 16, transition: 'box-shadow 0.2s',
+              }}>
+                <div style={{
+                  width: 48, height: 48, background: '#E8F4FD', borderRadius: 12,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, flexShrink: 0,
+                }}>
+                  {w.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 5 }}>{w.title}</div>
+                  <div style={{ fontSize: 13, color: '#5A7090', lineHeight: 1.55 }}>{w.text}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* B2B */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px 0' }}>
+        <div className="b2b-inner" style={{
+          background: 'linear-gradient(135deg, #0D2547 0%, #1A5C96 100%)',
+          borderRadius: 20, padding: '48px', color: 'white',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          gap: 32, flexWrap: 'wrap',
+        }}>
+          <div>
+            <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 8, letterSpacing: '-0.5px' }}>
+              Для бизнеса — особые условия
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.7, marginBottom: 18, lineHeight: 1.5 }}>
+              Крупные объёмы, оплата по безналу, счёт-фактура.<br/>Персональный менеджер.
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {['🔧 СТО', '🏥 Клиники', '🔬 Лаборатории', '👔 Магазины одежды', '🏭 Производства'].map(t => (
+                <span key={t} style={{
+                  background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 50, padding: '5px 14px', fontSize: 12, fontWeight: 600,
+                }}>{t}</span>
+              ))}
+            </div>
+          </div>
+          <a href={TG} target="_blank" rel="noopener" className="b2b-btn" style={{
+            background: 'white', color: '#0F4F85', padding: '14px 26px',
+            borderRadius: 50, fontSize: 14, fontWeight: 800,
+            textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
+            transition: 'background 0.2s',
+          }}>
+            Обсудить условия →
+          </a>
+        </div>
+      </div>
+
+      {/* REQUEST FORM */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }} id="callback">
+        <div style={{ fontSize: 11, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, textAlign: 'center' }}>
+          Обратный звонок
+        </div>
+        <div className="sec-h" style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 8, textAlign: 'center' }}>
+          Оставьте заявку
+        </div>
+        <div style={{ fontSize: 15, color: '#5A7090', marginBottom: 40, lineHeight: 1.6, textAlign: 'center' }}>
+          Менеджер свяжется с вами в течение часа
+        </div>
+
+        <div className="form-wrap" style={{
+          background: 'white', border: '1px solid #E5EEF8', borderRadius: 20,
+          padding: 40, maxWidth: 520, margin: '0 auto',
+        }}>
+          {success ? (
+            <div style={{ textAlign: 'center', padding: '16px 0' }}>
+              <div style={{ fontSize: 52, marginBottom: 14 }}>✅</div>
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: '#0F5A38', marginBottom: 8 }}>Заявка принята!</h3>
+              <p style={{ fontSize: 14, color: '#1A8F5A', lineHeight: 1.6 }}>
+                Наш менеджер свяжется с вами в течение часа.<br/>
+                Или напишите сами:{' '}
+                <a href={TG} style={{ color: '#1A6FB0', fontWeight: 700 }}>@aquadomm_bot</a>
+              </p>
+            </div>
+          ) : (
+            <>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#5A7090', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>
+                  Имя
+                </label>
+                <input
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  placeholder="Ваше имя"
+                  style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E5EEF8', borderRadius: 12, fontFamily: 'inherit', fontSize: 14, color: '#1A2332', background: '#F7F9FC', outline: 'none', transition: 'border 0.2s' }}
+                />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#5A7090', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>
+                  Телефон
+                </label>
+                <input
+                  value={form.phone}
+                  onChange={e => { const v = e.target.value; if (v.startsWith('+998')) setForm({ ...form, phone: v }) }}
+                  placeholder="+998 90 000 00 00"
+                  type="tel"
+                  style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E5EEF8', borderRadius: 12, fontFamily: 'inherit', fontSize: 14, color: '#1A2332', background: '#F7F9FC', outline: 'none', transition: 'border 0.2s' }}
+                />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: '#5A7090', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>
+                  Сообщение <span style={{ fontWeight: 400, opacity: 0.6 }}>(необязательно)</span>
+                </label>
+                <textarea
+                  value={form.message}
+                  onChange={e => setForm({ ...form, message: e.target.value })}
+                  placeholder="Какой объём нужен, как часто, есть ли вопросы..."
+                  rows={3}
+                  style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #E5EEF8', borderRadius: 12, fontFamily: 'inherit', fontSize: 14, color: '#1A2332', background: '#F7F9FC', outline: 'none', transition: 'border 0.2s', resize: 'vertical' }}
+                />
+              </div>
+              {error && (
+                <div style={{ fontSize: 13, color: '#D85A30', background: '#FAECE7', padding: '10px 14px', borderRadius: 10, marginBottom: 14 }}>
+                  {error}
+                </div>
+              )}
+              <button
+                className="sub-btn"
+                onClick={submit}
+                disabled={loading}
+                style={{
+                  width: '100%', padding: 15, background: '#1A6FB0', color: 'white',
+                  border: 'none', borderRadius: 50, fontFamily: 'inherit', fontSize: 15,
+                  fontWeight: 800, cursor: loading ? 'default' : 'pointer',
+                  opacity: loading ? 0.7 : 1, transition: 'background 0.2s',
+                }}
+              >
+                {loading ? 'Отправляем...' : 'Отправить заявку →'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer style={{ background: '#0D2547', color: 'white', padding: '48px 24px 32px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div className="ft-top" style={{ display: 'flex', justifyContent: 'space-between', gap: 32, flexWrap: 'wrap', marginBottom: 40 }}>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 800 }}>
+                <span style={{ fontWeight: 300, opacity: 0.7 }}>Aqua</span>Dom
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.4, marginTop: 4 }}>Дистиллированная вода для техники</div>
+              <div style={{ fontSize: 11, opacity: 0.3, marginTop: 6 }}>Не для питья</div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a href="/" className="ft-link" style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', transition: 'color 0.2s' }}>Главная</a>
+              <a href="/catalog" className="ft-link" style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', transition: 'color 0.2s' }}>Каталог</a>
+              <a href="#callback" className="ft-link" style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', transition: 'color 0.2s' }}>Оставить заявку</a>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a href={`tel:${PHONE}`} className="ft-contact" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, transition: 'color 0.2s' }}>
+                📞 {PHONE_DISPLAY}
+              </a>
+              <a href={TG} target="_blank" rel="noopener" className="ft-contact" style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, transition: 'color 0.2s' }}>
+                ✈ @aquadomm_bot
+              </a>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+                📍 Ташкент и весь Узбекистан
+              </div>
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 20, fontSize: 12, opacity: 0.35 }}>
+            © 2025 AquaDom — Дистиллированная вода. Только для технических нужд, не для питья.
+          </div>
         </div>
       </footer>
     </>
