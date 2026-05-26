@@ -1,5 +1,5 @@
 import { defineConfig } from 'sanity'
-import { structureTool } from 'sanity/structure'
+import { deskTool } from 'sanity/desk'
 import { schemaTypes } from './sanity/schema'
 
 export default defineConfig({
@@ -7,7 +7,7 @@ export default defineConfig({
   title: 'AquaDom',
   projectId: 'u9a9j56i',
   dataset: 'production',
-  plugins: [structureTool()],
+  plugins: [deskTool()],
   schema: {
     types: schemaTypes,
   },
