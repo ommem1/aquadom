@@ -3,10 +3,19 @@ export default {
   title: 'Товар',
   type: 'document',
   fields: [
+    // Основная информация
     {
       name: 'name',
-      title: 'Название',
+      title: 'Название товара',
       type: 'string',
+      validation: Rule => Rule.required()
+    },
+    {
+      name: 'slug',
+      title: 'URL (slug)',
+      type: 'slug',
+      description: 'Используется в адресе страницы. Пример: distillirovannaya-voda-10l',
+      options: { source: 'name', maxLength: 96 },
       validation: Rule => Rule.required()
     },
     {
@@ -20,9 +29,10 @@ export default {
           { title: 'Тройная дистилляция', value: 'triple' },
           { title: 'Электролит', value: 'electrolyte' },
           { title: 'Вода с ионами серебра', value: 'silver' },
-          { title: 'Оптом', value: 'bulk' },
+          { title: 'Оптом (от 100л)', value: 'bulk' },
         ]
-      }
+      },
+      validation: Rule => Rule.required()
     },
     {
       name: 'volume',
@@ -37,19 +47,15 @@ export default {
     },
     {
       name: 'oldPrice',
-      title: 'Цена до скидки (сум)',
+      title: 'Старая цена (сум)',
+      description: 'Если есть скидка — укажите цену до скидки',
       type: 'number',
     },
     {
       name: 'image',
-      title: 'Фото',
+      title: 'Фото товара',
       type: 'image',
       options: { hotspot: true }
-    },
-    {
-      name: 'description',
-      title: 'Описание',
-      type: 'text',
     },
     {
       name: 'inStock',
@@ -57,10 +63,91 @@ export default {
       type: 'boolean',
       initialValue: true,
     },
+
+    // Описание и характеристики
     {
-      name: 'sku',
-      title: 'SKU',
-      type: 'string',
+      name: 'description',
+      title: 'Описание товара',
+      description: 'Подробное описание для страницы товара. Используйте ключевые слова.',
+      type: 'text',
+      rows: 5,
     },
-  ]
+    {
+      name: 'specs',
+      title: 'Характеристики',
+      description: 'Технические характеристики товара',
+      type: 'array',
+      of: [{
+        type: 'object',
+        fields: [
+          { name: 'key', title: 'Параметр', type: 'string' },
+          { name: 'value', title: 'Значение', type: 'string' },
+        ],
+        preview: {
+          select: { title: 'key', subtitle: 'value' }
+        }
+      }]
+    },
+
+    // Ссылки на маркетплейсы
+    {
+      name: 'uzumUrl',
+      title: 'Ссылка на Uzum Market',
+      description: 'Прямая ссылка на товар на Uzum Market',
+      type: 'url',
+    },
+
+    // SEO поля
+    {
+      name: 'seo',
+      title: 'SEO настройки',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'SEO заголовок',
+          description: 'Заголовок в Google (до 60 символов). Пример: Дистиллированная вода 10л — купить в Ташкенте | AquaDom',
+          type: 'string',
+          validation: Rule => Rule.max(60).warning('Рекомендуется до 60 символов')
+        },
+        {
+          name: 'description',
+          title: 'SEO описание',
+          description: 'Описание в Google (до 160 символов). Включите ключевые слова.',
+          type: 'text',
+          rows: 3,
+          validation: Rule => Rule.max(160).warning('Рекомендуется до 160 символов')
+        },
+        {
+          name: 'keywords',
+          title: 'Ключевые слова',
+          description: 'Через запятую. Пример: дистиллированная вода, дистиллят 10л, вода для аккумулятора',
+          type: 'string',
+        },
+      ]
+    },
+  ],
+
+  preview: {
+    select: {
+      title: 'name',
+      subtitle: 'category',
+      media: 'image'
+    },
+    prepare({ title, subtitle, media }) {
+      const cats = {
+        distilled: 'Дистиллированная вода',
+        double: 'Двойная дистилляция',
+        triple: 'Тройная дистилляция',
+        electrolyte: 'Электролит',
+        silver: 'Ионы серебра',
+        bulk: 'Оптом'
+      }
+      return {
+        title,
+        subtitle: cats[subtitle] || subtitle,
+        media
+      }
+    }
+  }
 }
