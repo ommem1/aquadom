@@ -52,6 +52,7 @@ function Header() {
         <nav style={{ display: 'flex', gap: 24, alignItems: 'center' }} className="hdr-nav">
           <a href="/" style={{ fontSize: 14, fontWeight: 600, color: '#1A6FB0', textDecoration: 'none' }}>Главная</a>
           <a href="/catalog" style={{ fontSize: 14, fontWeight: 600, color: '#5A7090', textDecoration: 'none' }}>Каталог</a>
+          <a href="/b2b" style={{ fontSize: 14, fontWeight: 600, color: '#5A7090', textDecoration: 'none' }}>Для бизнеса</a>
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

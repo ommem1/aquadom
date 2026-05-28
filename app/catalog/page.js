@@ -229,6 +229,7 @@ export default function CatalogPage() {
   useEffect(() => {
     client.fetch(`*[_type == "product" && inStock == true] | order(category, volume) {
       _id, name, category, volume, price, oldPrice, uzumUrl, description,
+      "slug": slug.current,
       "imageUrl": image.asset->url
     }`).then(data => {
       setProducts(data)
@@ -366,11 +367,11 @@ export default function CatalogPage() {
                     display: 'flex', flexDirection: 'column',
                   }}
                 >
-                  {/* IMAGE */}
-                  <div style={{
+                  {/* IMAGE — clickable */}
+                  <a href={p.slug ? `/catalog/${p.slug}` : '#'} style={{
                     position: 'relative', background: '#F7F9FC',
                     height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    overflow: 'hidden',
+                    overflow: 'hidden', textDecoration: 'none',
                   }}>
                     {p.imageUrl
                       ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 16 }} />
@@ -383,19 +384,20 @@ export default function CatalogPage() {
                         fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 20,
                       }}>−{disc}%</span>
                     )}
-                  </div>
+                  </a>
 
                   {/* BODY */}
                   <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
                     <div style={{ fontSize: 10, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {CATS[p.category] || p.category}
                     </div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: '#1A2332', lineHeight: 1.3 }}>
+                    <a href={p.slug ? `/catalog/${p.slug}` : '#'} style={{ fontSize: 15, fontWeight: 800, color: '#1A2332', lineHeight: 1.3, textDecoration: 'none' }}>
                       {p.name}
-                    </div>
+                    </a>
                     {p.volume && (
                       <div style={{ fontSize: 12, color: '#5A7090' }}>{p.volume} л</div>
                     )}
+
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
                       <span style={{ fontSize: 20, fontWeight: 900, color: '#0F4F85' }}>{fmt(p.price)}</span>
                       {p.oldPrice && (
