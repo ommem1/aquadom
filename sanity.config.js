@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { schemaTypes } from './sanity/schema'
+import { GenerateSeoAction } from './sanity/actions/generateSeo'
 
 export default defineConfig({
   name: 'default',
@@ -11,5 +12,13 @@ export default defineConfig({
   plugins: [structureTool()],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    actions: (prev, context) => {
+      if (context.schemaType === 'product') {
+        return [GenerateSeoAction, ...prev]
+      }
+      return prev
+    },
   },
 })
