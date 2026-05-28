@@ -368,7 +368,7 @@ export default function CatalogPage() {
                   }}
                 >
                   {/* IMAGE — clickable */}
-                  <a href={p.slug ? `/catalog/${p.slug}` : '#'} style={{
+                  <a href={`/catalog/${p.slug || p._id}`} style={{
                     position: 'relative', background: '#F7F9FC',
                     height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     overflow: 'hidden', textDecoration: 'none',
@@ -391,7 +391,7 @@ export default function CatalogPage() {
                     <div style={{ fontSize: 10, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {CATS[p.category] || p.category}
                     </div>
-                    <a href={p.slug ? `/catalog/${p.slug}` : '#'} style={{ fontSize: 15, fontWeight: 800, color: '#1A2332', lineHeight: 1.3, textDecoration: 'none' }}>
+                    <a href={`/catalog/${p.slug || p._id}`} style={{ fontSize: 15, fontWeight: 800, color: '#1A2332', lineHeight: 1.3, textDecoration: 'none' }}>
                       {p.name}
                     </a>
                     {p.volume && (

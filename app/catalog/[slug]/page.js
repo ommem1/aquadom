@@ -69,8 +69,9 @@ export default function ProductPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (!slug) return
     client.fetch(
-      `*[_type == "product" && slug.current == $slug][0] {
+      `*[_type == "product" && (slug.current == $slug || _id == $slug)][0] {
         _id, name, category, volume, price, oldPrice, uzumUrl, description, inStock,
         "imageUrl": image.asset->url,
         specs[] { key, value }
