@@ -35,6 +35,32 @@ export default {
       validation: Rule => Rule.required()
     },
 
+    // Цена — для товаров БЕЗ вариантов объёма
+    {
+      name: 'price',
+      title: 'Цена (сум)',
+      description: 'Заполните если у товара один объём. Если есть варианты — укажите цены там.',
+      type: 'number',
+    },
+    {
+      name: 'oldPrice',
+      title: 'Старая цена (сум)',
+      description: 'Если есть скидка — укажите цену до скидки',
+      type: 'number',
+    },
+    {
+      name: 'volume',
+      title: 'Объём (л)',
+      description: 'Заполните если у товара один объём.',
+      type: 'number',
+    },
+    {
+      name: 'inStock',
+      title: 'В наличии',
+      type: 'boolean',
+      initialValue: true,
+    },
+
     // Варианты объёмов и цен
     {
       name: 'variants',
