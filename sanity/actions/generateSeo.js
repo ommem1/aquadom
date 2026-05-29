@@ -45,37 +45,51 @@ export function GenerateSeoAction(props) {
       }
 
       const { name, category, variants } = doc
-      const firstVariant = variants?.[0]
       const catLabel = CATEGORY_LABEL[category] || 'дистиллированная'
       const catUse = CATEGORY_USE[category] || ''
-      const volStr = firstVariant?.volume ? `${firstVariant.volume} л` : ''
-      const priceStr = firstVariant?.price ? firstVariant.price.toLocaleString('ru-RU') : ''
 
-      // SEO title (до 60 символов)
+      // Собираем данные по всем вариантам
+      const availVariants = (variants || []).filter(v => v.inStock !== false)
+      const allVariants = variants || []
+      const volumes = allVariants.map(v => v.volume).filter(Boolean).sort((a, b) => a - b)
+      const prices = allVariants.map(v => v.price).filter(Boolean)
+      const minPrice = prices.length ? Math.min(...prices) : null
+      const maxPrice = prices.length ? Math.max(...prices) : null
+
+      // Строки для вставки в текст
+      const volList = volumes.length ? volumes.join(', ') + ' л' : ''       // "1.5, 3, 5, 10 л"
+      const priceFrom = minPrice ? minPrice.toLocaleString('ru-RU') : ''
+      const priceTo = maxPrice && maxPrice !== minPrice ? maxPrice.toLocaleString('ru-RU') : ''
+      const priceStr = priceFrom
+        ? (priceTo ? `от ${priceFrom} до ${priceTo} сум` : `от ${priceFrom} сум`)
+        : ''
+
+      // SEO title (до 60 символов) — без объёма, он в description
       const rawTitle = name
         ? `${name} — купить в Ташкенте | AquaDom`
-        : `Вода ${catLabel}${volStr ? ' ' + volStr : ''} — купить в Ташкенте | AquaDom`
+        : `Вода ${catLabel} — купить в Ташкенте | AquaDom`
       const seoTitle = rawTitle.slice(0, 60)
 
       // SEO description (до 160 символов)
       const rawDesc = [
-        `Вода дистиллированная ${catLabel}${volStr ? ' ' + volStr : ''}.`,
-        priceStr ? `Цена ${priceStr} сум.` : '',
-        'Собственное производство, ГОСТ.',
+        `Вода дистиллированная ${catLabel}.`,
+        volList ? `Объёмы: ${volList}.` : '',
+        priceStr ? `Цена ${priceStr}.` : '',
+        'ГОСТ, собственное производство.',
         catUse ? `Подходит ${catUse}.` : '',
-        'Доставка по всему Узбекистану.',
+        'Доставка по Узбекистану.',
       ].filter(Boolean).join(' ')
       const seoDescription = rawDesc.slice(0, 160)
 
-      // Ключевые слова
+      // Ключевые слова — включаем все объёмы отдельно
+      const volKeywords = volumes.map(v => `дистиллированная вода ${v} л`)
       const keywords = [
-        `дистиллированная вода${volStr ? ' ' + volStr : ''}`,
-        volStr ? `дистиллят ${volStr}` : 'дистиллят',
+        `дистиллированная вода ${catLabel}`,
+        ...volKeywords,
         'вода для аккумулятора',
         'вода для утюга',
         'вода для увлажнителя',
         'купить дистиллят Ташкент',
-        'дистиллированная вода Узбекистан',
         'AquaDom',
       ].join(', ')
 
