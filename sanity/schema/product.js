@@ -14,7 +14,7 @@ export default {
       name: 'slug',
       title: 'URL (slug)',
       type: 'slug',
-      description: 'Используется в адресе страницы. Пример: distillirovannaya-voda-10l',
+      description: 'Используется в адресе страницы. Пример: distillirovannaya-voda',
       options: { source: 'name', maxLength: 96 },
       validation: Rule => Rule.required()
     },
@@ -34,34 +34,61 @@ export default {
       },
       validation: Rule => Rule.required()
     },
+
+    // Варианты объёмов и цен
     {
-      name: 'volume',
-      title: 'Объём (л)',
-      type: 'number',
+      name: 'variants',
+      title: 'Варианты (объём + цена)',
+      description: 'Добавьте все доступные объёмы с ценами. Первый вариант будет выбран по умолчанию.',
+      type: 'array',
+      validation: Rule => Rule.required().min(1).error('Добавьте хотя бы один вариант'),
+      of: [{
+        type: 'object',
+        name: 'variant',
+        title: 'Вариант',
+        fields: [
+          {
+            name: 'volume',
+            title: 'Объём (л)',
+            type: 'number',
+            validation: Rule => Rule.required()
+          },
+          {
+            name: 'price',
+            title: 'Цена (сум)',
+            type: 'number',
+            validation: Rule => Rule.required()
+          },
+          {
+            name: 'oldPrice',
+            title: 'Старая цена (сум)',
+            description: 'Если есть скидка — укажите цену до скидки',
+            type: 'number',
+          },
+          {
+            name: 'inStock',
+            title: 'В наличии',
+            type: 'boolean',
+            initialValue: true,
+          },
+        ],
+        preview: {
+          select: { volume: 'volume', price: 'price', inStock: 'inStock' },
+          prepare({ volume, price, inStock }) {
+            return {
+              title: `${volume} л — ${price?.toLocaleString('ru-RU')} сум`,
+              subtitle: inStock === false ? '❌ Нет в наличии' : '✅ В наличии'
+            }
+          }
+        }
+      }]
     },
-    {
-      name: 'price',
-      title: 'Цена (сум)',
-      type: 'number',
-      validation: Rule => Rule.required()
-    },
-    {
-      name: 'oldPrice',
-      title: 'Старая цена (сум)',
-      description: 'Если есть скидка — укажите цену до скидки',
-      type: 'number',
-    },
+
     {
       name: 'image',
       title: 'Фото товара',
       type: 'image',
       options: { hotspot: true }
-    },
-    {
-      name: 'inStock',
-      title: 'В наличии',
-      type: 'boolean',
-      initialValue: true,
     },
 
     // Описание и характеристики
@@ -106,7 +133,7 @@ export default {
         {
           name: 'title',
           title: 'SEO заголовок',
-          description: 'Заголовок в Google (до 60 символов). Пример: Дистиллированная вода 10л — купить в Ташкенте | AquaDom',
+          description: 'Заголовок в Google (до 60 символов). Пример: Дистиллированная вода — купить в Ташкенте | AquaDom',
           type: 'string',
           validation: Rule => Rule.max(60).warning('Рекомендуется до 60 символов')
         },
@@ -121,7 +148,7 @@ export default {
         {
           name: 'keywords',
           title: 'Ключевые слова',
-          description: 'Через запятую. Пример: дистиллированная вода, дистиллят 10л, вода для аккумулятора',
+          description: 'Через запятую. Пример: дистиллированная вода, дистиллят, вода для аккумулятора',
           type: 'string',
         },
       ]
@@ -132,9 +159,11 @@ export default {
     select: {
       title: 'name',
       subtitle: 'category',
-      media: 'image'
+      media: 'image',
+      v0: 'variants.0.volume',
+      p0: 'variants.0.price',
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, subtitle, media, v0, p0 }) {
       const cats = {
         distilled: 'Дистиллированная вода',
         double: 'Двойная дистилляция',
@@ -143,9 +172,10 @@ export default {
         silver: 'Ионы серебра',
         bulk: 'Оптом'
       }
+      const priceStr = p0 ? ` · от ${p0.toLocaleString('ru-RU')} сум` : ''
       return {
         title,
-        subtitle: cats[subtitle] || subtitle,
+        subtitle: (cats[subtitle] || subtitle) + priceStr,
         media
       }
     }

@@ -101,15 +101,18 @@ export default function CatalogPage() {
   const [modal, setModal] = useState(null)
 
   useEffect(() => {
-    client.fetch(`*[_type == "product" && inStock == true] | order(category, volume) {
-      _id, name, category, volume, price, oldPrice, uzumUrl, description,
+    client.fetch(`*[_type == "product"] | order(category, _createdAt) {
+      _id, name, category, uzumUrl,
       "slug": slug.current,
-      "imageUrl": image.asset->url
+      "imageUrl": image.asset->url,
+      variants[]{ volume, price, oldPrice, inStock }
     }`).then(data => { setProducts(data); setLoading(false) })
   }, [])
 
-  const filtered = cat === 'all' ? products : products.filter(p => p.category === cat)
-  const available = ['all', ...Object.keys(CATS).filter(k => products.some(p => p.category === k))]
+  // Фильтруем только товары с хотя бы одним вариантом в наличии
+  const inStockProducts = products.filter(p => p.variants?.some(v => v.inStock !== false))
+  const filtered = cat === 'all' ? inStockProducts : inStockProducts.filter(p => p.category === cat)
+  const available = ['all', ...Object.keys(CATS).filter(k => inStockProducts.some(p => p.category === k))]
 
   return (
     <>
@@ -193,7 +196,7 @@ export default function CatalogPage() {
               fontSize: 14, fontWeight: 600,
               color: cat === k ? 'white' : '#4A5568',
             }}>
-              {k === 'all' ? `Все (${products.length})` : `${CATS[k]} (${products.filter(p => p.category === k).length})`}
+              {k === 'all' ? `Все (${inStockProducts.length})` : `${CATS[k]} (${inStockProducts.filter(p => p.category === k).length})`}
             </button>
           ))}
         </div>
@@ -215,7 +218,10 @@ export default function CatalogPage() {
         ) : (
           <div className="p-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
             {filtered.map(p => {
-              const disc = p.oldPrice && p.price < p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0
+              const variants = p.variants || []
+              const prices = variants.map(v => v.price).filter(Boolean)
+              const minPrice = prices.length ? Math.min(...prices) : null
+              const hasDiscount = variants.some(v => v.oldPrice && v.price < v.oldPrice)
               return (
                 <div key={p._id} className="p-card">
                   {/* IMAGE */}
@@ -224,25 +230,44 @@ export default function CatalogPage() {
                       ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 20 }}/>
                       : <span style={{ fontSize: 72 }}>💧</span>
                     }
-                    {disc > 0 && (
-                      <span style={{ position: 'absolute', top: 12, right: 12, background: '#EF4444', color: 'white', fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>−{disc}%</span>
+                    {hasDiscount && (
+                      <span style={{ position: 'absolute', top: 12, right: 12, background: '#EF4444', color: 'white', fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>Скидка</span>
                     )}
                   </a>
 
                   {/* BODY */}
-                  <div style={{ padding: '18px 18px 20px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                  <div style={{ padding: '18px 18px 20px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {CATS[p.category] || p.category}
                     </div>
                     <a href={`/catalog/${p.slug || p._id}`} style={{ fontSize: 15, fontWeight: 700, color: '#0A0F1E', lineHeight: 1.35 }}>
                       {p.name}
                     </a>
-                    {p.volume && <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>{p.volume} л</div>}
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
-                      <span style={{ fontSize: 20, fontWeight: 800, color: '#0A0F1E', letterSpacing: '-0.5px' }}>{fmt(p.price)}</span>
-                      {p.oldPrice && <span style={{ fontSize: 13, color: '#CBD5E1', textDecoration: 'line-through' }}>{fmt(p.oldPrice)}</span>}
-                    </div>
+                    {/* Объёмы-чипы */}
+                    {variants.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 2 }}>
+                        {variants.map(v => (
+                          <span key={v.volume} style={{
+                            fontSize: 12, fontWeight: 600,
+                            padding: '3px 10px', borderRadius: 20,
+                            background: v.inStock === false ? '#F1F5F9' : '#EFF6FF',
+                            color: v.inStock === false ? '#94A3B8' : '#1A6FB0',
+                            textDecoration: v.inStock === false ? 'line-through' : 'none',
+                          }}>
+                            {v.volume} л
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Цена */}
+                    {minPrice != null && (
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
+                        <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>от</span>
+                        <span style={{ fontSize: 20, fontWeight: 800, color: '#0A0F1E', letterSpacing: '-0.5px' }}>{fmt(minPrice)}</span>
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto', paddingTop: 12 }}>
                       {p.uzumUrl && <a href={p.uzumUrl} target="_blank" rel="noopener" className="btn-uzum">Купить на Uzum →</a>}

@@ -44,11 +44,12 @@ export function GenerateSeoAction(props) {
         return
       }
 
-      const { name, category, volume, price } = doc
+      const { name, category, variants } = doc
+      const firstVariant = variants?.[0]
       const catLabel = CATEGORY_LABEL[category] || 'дистиллированная'
       const catUse = CATEGORY_USE[category] || ''
-      const volStr = volume ? `${volume} л` : ''
-      const priceStr = price ? price.toLocaleString('ru-RU') : ''
+      const volStr = firstVariant?.volume ? `${firstVariant.volume} л` : ''
+      const priceStr = firstVariant?.price ? firstVariant.price.toLocaleString('ru-RU') : ''
 
       // SEO title (до 60 символов)
       const rawTitle = name

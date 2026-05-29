@@ -33,6 +33,7 @@ export default function ProductPage() {
   const { slug } = useParams()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [selectedVariant, setSelectedVariant] = useState(null)
   const [qty, setQty] = useState(1)
   const [form, setForm] = useState({ name: '', phone: '+998', message: '' })
   const [submitting, setSubmitting] = useState(false)
@@ -43,26 +44,45 @@ export default function ProductPage() {
     if (!slug) return
     client.fetch(
       `*[_type == "product" && (slug.current == $slug || _id == $slug)][0] {
-        _id, name, category, volume, price, oldPrice, uzumUrl, description, inStock,
+        _id, name, category, uzumUrl, description,
         "imageUrl": image.asset->url,
+        variants[]{ volume, price, oldPrice, inStock },
         specs[] { key, value }
       }`,
       { slug }
-    ).then(data => { setProduct(data); setLoading(false) })
+    ).then(data => {
+      setProduct(data)
+      if (data?.variants?.length) {
+        // Выбираем первый вариант в наличии, иначе просто первый
+        const firstInStock = data.variants.find(v => v.inStock !== false) || data.variants[0]
+        setSelectedVariant(firstInStock)
+      }
+      setLoading(false)
+    })
   }, [slug])
 
   const submit = async () => {
     if (!form.name || form.phone.length < 9) { setError('Введите имя и номер телефона'); return }
     setSubmitting(true); setError('')
     try {
-      const productLabel = [product.name, product.volume ? `${product.volume} л` : null].filter(Boolean).join(', ')
-      const res = await fetch('/api/callback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, product: productLabel, quantity: qty }) })
+      const volStr = selectedVariant?.volume ? `, ${selectedVariant.volume} л` : ''
+      const productLabel = `${product.name}${volStr}`
+      const res = await fetch('/api/callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, product: productLabel, quantity: qty })
+      })
       const data = await res.json()
       if (data.success) setSubmitted(true)
       else setError('Ошибка. Напишите нам в Telegram.')
     } catch { setError('Ошибка сети. Попробуйте ещё раз.') }
     setSubmitting(false)
   }
+
+  const inStock = selectedVariant?.inStock !== false
+  const discount = selectedVariant?.oldPrice && selectedVariant.price < selectedVariant.oldPrice
+    ? Math.round((1 - selectedVariant.price / selectedVariant.oldPrice) * 100)
+    : 0
 
   return (
     <>
@@ -80,6 +100,8 @@ export default function ProductPage() {
         .qty-btn:hover { border-color: #1A6FB0 !important; background: #EFF6FF !important; color: #1A6FB0 !important; }
         .btn-uzum:hover { background: #0F5090 !important; }
         .sub-btn:hover:not(:disabled) { background: #0F5090 !important; }
+        .var-btn { font-family: inherit; cursor: pointer; transition: all 0.15s; }
+        .var-btn:hover:not(:disabled) { border-color: #1A6FB0 !important; background: #EFF6FF !important; }
 
         input, textarea { width: 100%; padding: 13px 15px; border: 1.5px solid #E2E8F0; border-radius: 12px; font-family: inherit; font-size: 15px; color: #0A0F1E; background: #F8FAFC; outline: none; transition: border-color 0.2s, background 0.2s; }
         input:focus, textarea:focus { border-color: #1A6FB0 !important; background: white !important; }
@@ -150,8 +172,11 @@ export default function ProductPage() {
                   ) : (
                     <div style={{ width: '100%', aspectRatio: '1/1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 96 }}>💧</div>
                   )}
-                  {!product.inStock && (
+                  {!inStock && (
                     <div style={{ position: 'absolute', top: 16, left: 16, background: '#94A3B8', color: 'white', borderRadius: 20, padding: '5px 14px', fontSize: 13, fontWeight: 600 }}>Нет в наличии</div>
+                  )}
+                  {discount > 0 && (
+                    <div style={{ position: 'absolute', top: 16, right: 16, background: '#EF4444', color: 'white', borderRadius: 20, padding: '5px 14px', fontSize: 13, fontWeight: 700 }}>−{discount}%</div>
                   )}
                 </div>
                 {/* Trust badges */}
@@ -169,43 +194,86 @@ export default function ProductPage() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
                   {CATS[product.category] || product.category}
                 </div>
-                <h1 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 900, letterSpacing: '-1px', lineHeight: 1.15, marginBottom: 10, color: '#0A0F1E' }}>
+                <h1 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 900, letterSpacing: '-1px', lineHeight: 1.15, marginBottom: 20, color: '#0A0F1E' }}>
                   {product.name}
                 </h1>
-                {product.volume && (
-                  <div style={{ fontSize: 15, color: '#64748B', marginBottom: 24, fontWeight: 500 }}>Объём: {product.volume} л</div>
+
+                {/* VARIANT SELECTOR */}
+                {product.variants?.length > 0 && (
+                  <div style={{ marginBottom: 28 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+                      Объём
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                      {product.variants.map(v => {
+                        const isSelected = selectedVariant?.volume === v.volume
+                        const isAvail = v.inStock !== false
+                        return (
+                          <button
+                            key={v.volume}
+                            className="var-btn"
+                            disabled={!isAvail}
+                            onClick={() => { setSelectedVariant(v); setQty(1) }}
+                            style={{
+                              padding: '10px 20px',
+                              borderRadius: 50,
+                              border: `2px solid ${isSelected ? '#1A6FB0' : '#E2E8F0'}`,
+                              background: isSelected ? '#EFF6FF' : 'white',
+                              color: isSelected ? '#1A6FB0' : isAvail ? '#374151' : '#CBD5E1',
+                              fontWeight: 700,
+                              fontSize: 15,
+                              opacity: isAvail ? 1 : 0.45,
+                              cursor: isAvail ? 'pointer' : 'not-allowed',
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            <div>{v.volume} л</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, marginTop: 2, color: isSelected ? '#1A6FB0' : '#64748B' }}>
+                              {fmt(v.price)}
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
                 )}
 
                 {/* PRICE */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 32 }}>
-                  <span style={{ fontSize: 40, fontWeight: 900, color: '#0A0F1E', letterSpacing: '-1.5px' }}>{fmt(product.price)}</span>
-                  {product.oldPrice && (
-                    <>
-                      <span style={{ fontSize: 20, color: '#CBD5E1', textDecoration: 'line-through', fontWeight: 500 }}>{fmt(product.oldPrice)}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, background: '#DCFCE7', color: '#16A34A', padding: '4px 12px', borderRadius: 20 }}>
-                        −{Math.round((1 - product.price / product.oldPrice) * 100)}%
-                      </span>
-                    </>
-                  )}
-                </div>
+                {selectedVariant && (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 28 }}>
+                    <span style={{ fontSize: 40, fontWeight: 900, color: '#0A0F1E', letterSpacing: '-1.5px' }}>{fmt(selectedVariant.price)}</span>
+                    {selectedVariant.oldPrice && (
+                      <>
+                        <span style={{ fontSize: 20, color: '#CBD5E1', textDecoration: 'line-through', fontWeight: 500 }}>{fmt(selectedVariant.oldPrice)}</span>
+                        {discount > 0 && (
+                          <span style={{ fontSize: 13, fontWeight: 700, background: '#DCFCE7', color: '#16A34A', padding: '4px 12px', borderRadius: 20 }}>
+                            −{discount}%
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
 
                 {/* QUANTITY */}
-                <div style={{ marginBottom: 24 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>Количество</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <button className="qty-btn" onClick={() => setQty(q => Math.max(1, q - 1))}>−</button>
-                    <span style={{ fontSize: 22, fontWeight: 800, minWidth: 36, textAlign: 'center', color: '#0A0F1E' }}>{qty}</span>
-                    <button className="qty-btn" onClick={() => setQty(q => Math.min(100, q + 1))}>+</button>
-                    {product.volume && (
-                      <span style={{ fontSize: 14, color: '#64748B' }}>
-                        = {(qty * product.volume % 1 === 0 ? qty * product.volume : (qty * product.volume).toFixed(1))} л
+                {selectedVariant && (
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>Количество</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <button className="qty-btn" onClick={() => setQty(q => Math.max(1, q - 1))}>−</button>
+                      <span style={{ fontSize: 22, fontWeight: 800, minWidth: 36, textAlign: 'center', color: '#0A0F1E' }}>{qty}</span>
+                      <button className="qty-btn" onClick={() => setQty(q => Math.min(100, q + 1))}>+</button>
+                      {selectedVariant.volume && (
+                        <span style={{ fontSize: 14, color: '#64748B' }}>
+                          = {(qty * selectedVariant.volume % 1 === 0 ? qty * selectedVariant.volume : (qty * selectedVariant.volume).toFixed(1))} л
+                        </span>
+                      )}
+                      <span style={{ fontSize: 17, fontWeight: 800, color: '#1A6FB0', marginLeft: 4 }}>
+                        {fmt(selectedVariant.price * qty)}
                       </span>
-                    )}
-                    <span style={{ fontSize: 17, fontWeight: 800, color: '#1A6FB0', marginLeft: 4 }}>
-                      {fmt(product.price * qty)}
-                    </span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* UZUM */}
                 {product.uzumUrl && (
@@ -233,6 +301,7 @@ export default function ProductPage() {
                     <>
                       <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 18, color: '#0A0F1E' }}>
                         Оставить заявку{qty > 1 ? ` на ${qty} шт.` : ''}
+                        {selectedVariant?.volume ? ` · ${selectedVariant.volume} л` : ''}
                       </div>
                       <div className="form-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                         <div>
@@ -251,13 +320,13 @@ export default function ProductPage() {
                         <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Адрес доставки, вопросы..." rows={2} style={{ resize: 'none' }}/>
                       </div>
                       {error && <div style={{ fontSize: 13, color: '#B91C1C', background: '#FEF2F2', padding: '10px 14px', borderRadius: 10, marginBottom: 12, border: '1px solid #FCA5A5' }}>{error}</div>}
-                      <button className="sub-btn" onClick={submit} disabled={submitting || !product.inStock} style={{
-                        width: '100%', padding: 14, background: product.inStock ? '#1A6FB0' : '#94A3B8',
+                      <button className="sub-btn" onClick={submit} disabled={submitting || !inStock} style={{
+                        width: '100%', padding: 14, background: inStock ? '#1A6FB0' : '#94A3B8',
                         color: 'white', border: 'none', borderRadius: 50, fontFamily: 'inherit',
-                        fontSize: 15, fontWeight: 700, cursor: submitting || !product.inStock ? 'default' : 'pointer',
+                        fontSize: 15, fontWeight: 700, cursor: submitting || !inStock ? 'default' : 'pointer',
                         opacity: submitting ? 0.7 : 1, transition: 'background 0.2s',
                       }}>
-                        {submitting ? 'Отправляем...' : !product.inStock ? 'Нет в наличии' : 'Отправить заявку →'}
+                        {submitting ? 'Отправляем...' : !inStock ? 'Нет в наличии' : 'Отправить заявку →'}
                       </button>
                     </>
                   )}
