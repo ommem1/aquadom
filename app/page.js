@@ -21,6 +21,57 @@ const WHY = [
   { icon: '🚚', title: 'Доставка по всему Узбекистану', text: 'По Ташкенту — своя курьерская служба. По регионам — партнёрские курьерские компании.' },
 ]
 
+const REVIEWS = [
+  {
+    name: 'Елена',
+    product: 'Двойная дистилляция, 3 л',
+    text: 'Быстрая доставка, вода хорошо упакована, абсолютно прозрачная. Расходуется в утюге намного медленнее, пар более ровный — заметно лучше, чем у воды от другого продавца. Спасибо за качество!',
+    date: 'ноябрь 2025',
+  },
+  {
+    name: 'Юлия',
+    product: 'Вода для увлажнителей, 10 л',
+    text: 'Покупала для увлажнителя воздуха и генератора кислорода. Доставили быстро, до двери квартиры. Буду покупать здесь и впредь. Спасибо!',
+    date: 'март 2026',
+  },
+  {
+    name: 'Mirzohid',
+    product: 'Дистиллированная вода, 5 л',
+    text: 'Проверил тестером — показало 0.000. Это говорит о том, что вода действительно чистая. Отличное качество!',
+    date: 'октябрь 2025',
+  },
+  {
+    name: 'Юлия',
+    product: 'Дист. вода для утюгов, 5 л',
+    text: 'Не первый раз берём у этого продавца. Очень рады, что теперь он появился на Uzum. Рекомендуем!',
+    date: 'октябрь 2024',
+  },
+  {
+    name: 'Покупатель',
+    product: 'Двойная дистилляция, 10 л',
+    text: 'Качественная вода для косметологии — для лазерного аппарата в самый раз. Привезли с бесплатной доставкой через пару часов после заказа!',
+    date: 'март 2026',
+  },
+  {
+    name: 'Дурдона',
+    product: 'Дистиллированная вода, 5 л',
+    text: 'Оригинал. Спасибо поставщику — быстро доставили, вежливый персонал.',
+    date: 'февраль 2026',
+  },
+  {
+    name: 'Мадина',
+    product: 'Дистиллированная вода, 3 л',
+    text: 'Товар получила в целости и сохранности. Всем рекомендую, покупайте!',
+    date: 'май 2025',
+  },
+  {
+    name: 'Татьяна',
+    product: 'Дистиллированная вода, 1.5 л',
+    text: 'Отлично, никаких претензий нет. Рекомендую.',
+    date: 'июнь 2025',
+  },
+]
+
 function Header() {
   return (
     <header style={{
@@ -116,6 +167,10 @@ export default function Home() {
         .why-card:hover { box-shadow: 0 8px 24px rgba(15,28,46,0.07); }
         .catalog-link:hover { background: #0F4F85 !important; }
         .b2b-btn:hover { background: #E8F4FD !important; }
+        .reviews-track { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .reviews-track::-webkit-scrollbar { display: none; }
+        .review-card { scroll-snap-align: start; flex-shrink: 0; width: 300px; background: white; border-radius: 18px; padding: 22px; box-shadow: 0 2px 14px rgba(15,28,46,0.07); border: 1px solid #EEF3FA; display: flex; flex-direction: column; gap: 12px; }
+        @media (max-width: 640px) { .review-card { width: 270px; } }
         .sub-btn:hover:not(:disabled) { background: #0F4F85 !important; }
         .ft-link:hover { color: white !important; }
         .ft-contact:hover { color: white !important; }
@@ -301,6 +356,66 @@ export default function Home() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* REVIEWS */}
+      <div style={{ background: '#F0F6FF', padding: '72px 0 64px', marginTop: 72 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 32 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1A6FB0', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
+                Отзывы покупателей
+              </div>
+              <div className="sec-h" style={{ fontSize: 30, fontWeight: 900, color: '#0F1E33', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+                Что говорят наши клиенты
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #D4E8FA', borderRadius: 50, padding: '8px 18px' }}>
+              <span style={{ color: '#F5A623', fontSize: 16 }}>★</span>
+              <span style={{ fontWeight: 800, fontSize: 16, color: '#0F1E33' }}>4.9</span>
+              <span style={{ color: '#5A7090', fontSize: 13 }}>на Uzum Market</span>
+            </div>
+          </div>
+
+          {/* Scrollable track */}
+          <div className="reviews-track">
+            {REVIEWS.map((r, i) => {
+              const initials = r.name === 'Покупатель' ? '?' : r.name[0].toUpperCase()
+              const colors = ['#1A6FB0','#0F4F85','#2585CC','#1A5C96','#0D3A6E','#1E7BC4','#0A3260','#1560A0']
+              const avatarBg = colors[i % colors.length]
+              return (
+                <div key={i} className="review-card">
+                  {/* Top: avatar + name + stars */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 42, height: 42, borderRadius: '50%',
+                      background: avatarBg, color: 'white',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 800, fontSize: 17, flexShrink: 0,
+                    }}>{initials}</div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: 15, color: '#0F1E33', lineHeight: 1.2 }}>{r.name}</div>
+                      <div style={{ color: '#F5A623', fontSize: 14, letterSpacing: 1 }}>★★★★★</div>
+                    </div>
+                  </div>
+                  {/* Text */}
+                  <div style={{ fontSize: 13.5, color: '#2A3F5A', lineHeight: 1.6, flexGrow: 1 }}>
+                    &ldquo;{r.text}&rdquo;
+                  </div>
+                  {/* Footer: product + date */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{
+                      background: '#EEF6FF', color: '#1A6FB0', borderRadius: 50,
+                      padding: '3px 10px', fontSize: 11, fontWeight: 700,
+                    }}>{r.product}</span>
+                    <span style={{ fontSize: 11, color: '#8A9BB0' }}>{r.date}</span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
