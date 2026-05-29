@@ -1,4 +1,4 @@
-import { useClient } from 'sanity'
+import { useDocumentOperation } from 'sanity'
 import { useState } from 'react'
 
 const CATEGORY_LABEL = {
@@ -20,7 +20,7 @@ const CATEGORY_USE = {
 }
 
 export function GenerateSeoAction(props) {
-  const client = useClient({ apiVersion: '2024-01-01' })
+  const { patch } = useDocumentOperation(props.id, props.type)
   const [status, setStatus] = useState('idle') // idle | loading | done | error
 
   const label = {
@@ -34,12 +34,13 @@ export function GenerateSeoAction(props) {
     label,
     tone: status === 'done' ? 'positive' : status === 'error' ? 'critical' : 'primary',
     disabled: status === 'loading',
-    onHandle: async () => {
+    onHandle: () => {
       setStatus('loading')
 
       const doc = props.draft || props.published
       if (!doc) {
         setStatus('error')
+        setTimeout(() => setStatus('idle'), 3000)
         return
       }
 
@@ -78,12 +79,11 @@ export function GenerateSeoAction(props) {
       ].join(', ')
 
       try {
-        // Патчим черновик если есть, иначе — опубликованный
-        const docId = props.draft ? `drafts.${props.id}` : props.id
-        await client
-          .patch(docId)
-          .set({ seo: { title: seoTitle, description: seoDescription, keywords } })
-          .commit()
+        // patch.execute обновляет форму мгновенно, без перезагрузки
+        patch.execute([
+          { setIfMissing: { seo: {} } },
+          { set: { 'seo.title': seoTitle, 'seo.description': seoDescription, 'seo.keywords': keywords } },
+        ])
         setStatus('done')
         setTimeout(() => setStatus('idle'), 3000)
       } catch (err) {
