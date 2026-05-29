@@ -38,83 +38,64 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru">
       <head>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
-          {
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "AquaDom",
-            "description": "Дистиллированная вода для техники с доставкой по Узбекистану. Собственное производство, ГОСТ.",
-            "url": "https://aquadom.uz",
-            "image": "https://aquadom.uz/opengraph-image",
-            "telephone": "+998901860128",
-            "address": {
-              "@type": "PostalAddress",
-              "addressCountry": "UZ",
-              "addressLocality": "Ташкент"
-            },
-            "areaServed": {
-              "@type": "Country",
-              "name": "Узбекистан"
-            },
-            "priceRange": "30000-85000 UZS",
-            "sameAs": ["https://t.me/aquadomm_bot"],
-            "hasOfferCatalog": {
-              "@type": "OfferCatalog",
-              "name": "Дистиллированная вода",
-              "itemListElement": [
-                {
-                  "@type": "Offer",
-                  "name": "Дистиллированная вода 1.5 л",
-                  "price": "30000",
-                  "priceCurrency": "UZS",
-                  "availability": "https://schema.org/InStock",
-                  "seller": { "@type": "Organization", "name": "AquaDom" }
-                },
-                {
-                  "@type": "Offer",
-                  "name": "Дистиллированная вода 3 л",
-                  "price": "58000",
-                  "priceCurrency": "UZS",
-                  "availability": "https://schema.org/InStock",
-                  "seller": { "@type": "Organization", "name": "AquaDom" }
-                },
-                {
-                  "@type": "Offer",
-                  "name": "Дистиллированная вода 5 л",
-                  "price": "65000",
-                  "priceCurrency": "UZS",
-                  "availability": "https://schema.org/InStock",
-                  "seller": { "@type": "Organization", "name": "AquaDom" }
-                },
-                {
-                  "@type": "Offer",
-                  "name": "Дистиллированная вода 10 л",
-                  "price": "85000",
-                  "priceCurrency": "UZS",
-                  "availability": "https://schema.org/InStock",
-                  "seller": { "@type": "Organization", "name": "AquaDom" }
-                }
-              ]
-            }
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "AquaDom",
+          "description": "Дистиллированная вода для техники с доставкой по Узбекистану. Собственное производство, ГОСТ.",
+          "url": "https://aquadom.uz",
+          "image": "https://aquadom.uz/opengraph-image",
+          "telephone": "+998901860128",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "UZ",
+            "addressLocality": "Ташкент"
           },
-          {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": "Дистиллированная вода AquaDom",
-            "description": "Дистиллированная вода собственного производства. ГОСТ. pH = 0. Для увлажнителей, утюгов, аккумуляторов и радиаторов.",
-            "brand": { "@type": "Brand", "name": "AquaDom" },
-            "manufacturer": { "@type": "Organization", "name": "AquaDom", "url": "https://aquadom.uz" },
-            "offers": {
-              "@type": "AggregateOffer",
-              "lowPrice": "30000",
-              "highPrice": "85000",
-              "priceCurrency": "UZS",
-              "availability": "https://schema.org/InStock",
-              "seller": { "@type": "Organization", "name": "AquaDom" },
-              "offerCount": "4"
-            }
+          "areaServed": {
+            "@type": "Country",
+            "name": "Узбекистан"
+          },
+          "priceRange": "30000-85000 UZS",
+          "sameAs": ["https://t.me/aquadomm_bot"],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Дистиллированная вода",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "name": "Дистиллированная вода 1.5 л",
+                "price": "30000",
+                "priceCurrency": "UZS",
+                "availability": "https://schema.org/InStock",
+                "seller": { "@type": "Organization", "name": "AquaDom" }
+              },
+              {
+                "@type": "Offer",
+                "name": "Дистиллированная вода 3 л",
+                "price": "58000",
+                "priceCurrency": "UZS",
+                "availability": "https://schema.org/InStock",
+                "seller": { "@type": "Organization", "name": "AquaDom" }
+              },
+              {
+                "@type": "Offer",
+                "name": "Дистиллированная вода 5 л",
+                "price": "65000",
+                "priceCurrency": "UZS",
+                "availability": "https://schema.org/InStock",
+                "seller": { "@type": "Organization", "name": "AquaDom" }
+              },
+              {
+                "@type": "Offer",
+                "name": "Дистиллированная вода 10 л",
+                "price": "85000",
+                "priceCurrency": "UZS",
+                "availability": "https://schema.org/InStock",
+                "seller": { "@type": "Organization", "name": "AquaDom" }
+              }
+            ]
           }
-        ])}} />
+        })}} />
       </head>
       <body>{children}</body>
     </html>
