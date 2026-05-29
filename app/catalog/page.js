@@ -109,8 +109,10 @@ export default function CatalogPage() {
     }`).then(data => { setProducts(data); setLoading(false) })
   }, [])
 
-  // Фильтруем только товары с хотя бы одним вариантом в наличии
-  const inStockProducts = products.filter(p => p.variants?.some(v => v.inStock !== false))
+  // Показываем все товары: если variants нет (старый формат) — показываем, если есть — хотя бы один в наличии
+  const inStockProducts = products.filter(p =>
+    !p.variants?.length || p.variants.some(v => v.inStock !== false)
+  )
   const filtered = cat === 'all' ? inStockProducts : inStockProducts.filter(p => p.category === cat)
   const available = ['all', ...Object.keys(CATS).filter(k => inStockProducts.some(p => p.category === k))]
 
