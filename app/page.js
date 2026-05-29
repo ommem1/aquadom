@@ -167,6 +167,7 @@ export default function Home() {
         .why-card:hover { box-shadow: 0 8px 24px rgba(15,28,46,0.07); }
         .catalog-link:hover { background: #0F4F85 !important; }
         .b2b-btn:hover { background: #E8F4FD !important; }
+        .uzum-badge:hover { box-shadow: 0 4px 16px rgba(26,111,176,0.15) !important; }
         .reviews-track { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .reviews-track::-webkit-scrollbar { display: none; }
         .review-card { scroll-snap-align: start; flex-shrink: 0; width: 300px; background: white; border-radius: 18px; padding: 22px; box-shadow: 0 2px 14px rgba(15,28,46,0.07); border: 1px solid #EEF3FA; display: flex; flex-direction: column; gap: 12px; }
@@ -373,11 +374,11 @@ export default function Home() {
                 Что говорят наши клиенты
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #D4E8FA', borderRadius: 50, padding: '8px 18px' }}>
+            <a href="https://uzum.uz/ru/shop/distillirovannayavoda" target="_blank" rel="noopener" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #D4E8FA', borderRadius: 50, padding: '8px 18px', textDecoration: 'none', transition: 'box-shadow 0.2s' }} className="uzum-badge">
               <span style={{ color: '#F5A623', fontSize: 16 }}>★</span>
               <span style={{ fontWeight: 800, fontSize: 16, color: '#0F1E33' }}>4.9</span>
               <span style={{ color: '#5A7090', fontSize: 13 }}>на Uzum Market</span>
-            </div>
+            </a>
           </div>
 
           {/* Scrollable track */}
