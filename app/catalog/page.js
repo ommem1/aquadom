@@ -102,7 +102,7 @@ export default function CatalogPage() {
 
   useEffect(() => {
     client.fetch(`*[_type == "product"] | order(category, _createdAt) {
-      _id, name, category, uzumUrl,
+      _id, name, category, uzumUrl, price, oldPrice, volume,
       "slug": slug.current,
       "imageUrl": image.asset->url,
       variants[]{ volume, price, oldPrice, inStock }
@@ -221,9 +221,12 @@ export default function CatalogPage() {
           <div className="p-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
             {filtered.map(p => {
               const variants = p.variants || []
+              const hasVariants = variants.length > 0
               const prices = variants.map(v => v.price).filter(Boolean)
-              const minPrice = prices.length ? Math.min(...prices) : null
-              const hasDiscount = variants.some(v => v.oldPrice && v.price < v.oldPrice)
+              const minPrice = hasVariants ? (prices.length ? Math.min(...prices) : null) : p.price
+              const hasDiscount = hasVariants
+                ? variants.some(v => v.oldPrice && v.price < v.oldPrice)
+                : (p.oldPrice && p.price < p.oldPrice)
               return (
                 <div key={p._id} className="p-card">
                   {/* IMAGE */}
@@ -266,8 +269,11 @@ export default function CatalogPage() {
                     {/* Цена */}
                     {minPrice != null && (
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
-                        <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>от</span>
+                        {hasVariants && <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>от</span>}
                         <span style={{ fontSize: 20, fontWeight: 800, color: '#0A0F1E', letterSpacing: '-0.5px' }}>{fmt(minPrice)}</span>
+                        {!hasVariants && p.oldPrice && (
+                          <span style={{ fontSize: 13, color: '#CBD5E1', textDecoration: 'line-through' }}>{fmt(p.oldPrice)}</span>
+                        )}
                       </div>
                     )}
 
