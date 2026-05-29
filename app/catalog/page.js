@@ -7,7 +7,7 @@ const CATS = {
   double: 'Двойная дистилляция',
   triple: 'Тройная дистилляция',
   electrolyte: 'Электролит',
-  silver: 'Вода с ионами серебра',
+  silver: 'С ионами серебра',
   bulk: 'Оптом',
 }
 
@@ -15,56 +15,18 @@ const PHONE = '+998901860128'
 const PHONE_DISPLAY = '+998 90 186 01 28'
 const TG = 'https://t.me/aquadomm_bot'
 
-function fmt(n) {
-  return n?.toLocaleString('ru') + ' сум'
-}
+function fmt(n) { return n?.toLocaleString('ru') + ' сум' }
 
-function Header() {
-  return (
-    <header style={{
-      position: 'sticky', top: 0, zIndex: 100,
-      background: 'white', borderBottom: '1px solid #E5EEF8',
-    }}>
-      <div style={{
-        maxWidth: 1200, margin: '0 auto', padding: '12px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-      }}>
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <svg width="34" height="34" viewBox="0 0 92 92" fill="none">
-            <path d="M46 5C20 27 8 49 8 63C8 77 25 90 46 90C67 90 84 77 84 63C84 49 72 27 46 5Z" fill="#1A6FB0"/>
-            <ellipse cx="30" cy="32" rx="8" ry="4" fill="white" opacity="0.18" transform="rotate(-25,30,32)"/>
-            <polygon points="32,55 46,40 60,55" fill="white"/>
-            <rect x="32" y="54" width="28" height="22" fill="white"/>
-            <rect x="40" y="64" width="12" height="12" rx="3" fill="#1A6FB0"/>
-            <rect x="34" y="58" width="7" height="6" rx="1" fill="#BEDAF5"/>
-          </svg>
-          <div>
-            <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.5px' }}>
-              <span style={{ fontWeight: 300, color: '#1A6FB0' }}>Aqua</span>
-              <span style={{ color: '#0F4F85' }}>Dom</span>
-            </div>
-            <div style={{ fontSize: 10, color: '#5A7090', marginTop: 2 }}>Дистиллированная вода</div>
-          </div>
-        </a>
-
-        <nav style={{ display: 'flex', gap: 24, alignItems: 'center' }} className="hdr-nav">
-          <a href="/" style={{ fontSize: 14, fontWeight: 600, color: '#5A7090', textDecoration: 'none' }}>Главная</a>
-          <a href="/catalog" style={{ fontSize: 14, fontWeight: 600, color: '#1A6FB0', textDecoration: 'none' }}>Каталог</a>
-        </nav>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <a href={`tel:${PHONE}`} className="hdr-phone" style={{
-            fontSize: 14, fontWeight: 700, color: '#1A2332', textDecoration: 'none',
-          }}>{PHONE_DISPLAY}</a>
-          <a href={TG} target="_blank" rel="noopener" style={{
-            background: '#1A6FB0', color: 'white', padding: '9px 20px',
-            borderRadius: 50, fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
-          }}>Telegram</a>
-        </div>
-      </div>
-    </header>
-  )
-}
+const LOGO = (
+  <svg width="36" height="36" viewBox="0 0 92 92" fill="none">
+    <path d="M46 5C20 27 8 49 8 63C8 77 25 90 46 90C67 90 84 77 84 63C84 49 72 27 46 5Z" fill="#1A6FB0"/>
+    <ellipse cx="30" cy="32" rx="8" ry="4" fill="white" opacity="0.18" transform="rotate(-25,30,32)"/>
+    <polygon points="32,55 46,40 60,55" fill="white"/>
+    <rect x="32" y="54" width="28" height="22" fill="white"/>
+    <rect x="40" y="64" width="12" height="12" rx="3" fill="#1A6FB0"/>
+    <rect x="34" y="58" width="7" height="6" rx="1" fill="#BEDAF5"/>
+  </svg>
+)
 
 function Modal({ product, onClose }) {
   const [form, setForm] = useState({ name: '', phone: '+998', message: '' })
@@ -78,139 +40,51 @@ function Modal({ product, onClose }) {
   }, [])
 
   const submit = async () => {
-    if (!form.name || form.phone.length < 9) {
-      setError('Введите имя и номер телефона')
-      return
-    }
-    setLoading(true)
-    setError('')
+    if (!form.name || form.phone.length < 9) { setError('Введите имя и номер телефона'); return }
+    setLoading(true); setError('')
     try {
-      const res = await fetch('/api/callback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, product: product.name }),
-      })
+      const res = await fetch('/api/callback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, product: product.name }) })
       const data = await res.json()
       if (data.success) setSuccess(true)
       else setError('Ошибка. Напишите нам в Telegram.')
-    } catch {
-      setError('Ошибка сети. Попробуйте ещё раз.')
-    }
+    } catch { setError('Ошибка сети. Попробуйте ещё раз.') }
     setLoading(false)
   }
 
-  const inputStyle = {
-    width: '100%', padding: '12px 14px', border: '1.5px solid #E5EEF8',
-    borderRadius: 12, fontFamily: 'inherit', fontSize: 14, color: '#1A2332',
-    background: '#F7F9FC', outline: 'none', transition: 'border 0.2s',
-  }
-  const labelStyle = {
-    display: 'block', fontSize: 11, fontWeight: 800, color: '#5A7090',
-    textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6,
-  }
-
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(10,20,40,0.65)',
-        zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24, backdropFilter: 'blur(4px)',
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          background: 'white', borderRadius: 20, padding: 32,
-          width: '100%', maxWidth: 440, position: 'relative',
-          maxHeight: '90vh', overflowY: 'auto',
-        }}
-      >
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute', top: 14, right: 14,
-            background: '#F7F9FC', border: 'none', borderRadius: '50%',
-            width: 32, height: 32, fontSize: 18, cursor: 'pointer',
-            color: '#5A7090', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            lineHeight: 1,
-          }}
-        >×</button>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(10,15,30,0.7)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backdropFilter: 'blur(6px)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 24, padding: 32, width: '100%', maxWidth: 440, position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: '#F1F5F9', border: 'none', borderRadius: '50%', width: 34, height: 34, fontSize: 18, cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
 
         {success ? (
-          <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <div style={{ fontSize: 52, marginBottom: 14 }}>✅</div>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0F5A38', marginBottom: 8 }}>Заявка принята!</h3>
-            <p style={{ fontSize: 14, color: '#1A8F5A', lineHeight: 1.6, marginBottom: 20 }}>
-              Менеджер свяжется с вами в течение часа.
-            </p>
-            <button
-              onClick={onClose}
-              style={{
-                background: '#1A6FB0', color: 'white', border: 'none',
-                padding: '12px 28px', borderRadius: 50, fontFamily: 'inherit',
-                fontSize: 14, fontWeight: 700, cursor: 'pointer',
-              }}
-            >Закрыть</button>
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: '#065F46', marginBottom: 10 }}>Заявка принята!</h3>
+            <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.6, marginBottom: 24 }}>Менеджер свяжется с вами в течение часа.</p>
+            <button onClick={onClose} style={{ background: '#1A6FB0', color: 'white', border: 'none', padding: '12px 32px', borderRadius: 50, fontFamily: 'inherit', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Закрыть</button>
           </div>
         ) : (
           <>
-            <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 4, paddingRight: 32 }}>Оставить заявку</h3>
-            <div style={{
-              fontSize: 13, color: '#5A7090', background: '#F7F9FC',
-              padding: '8px 12px', borderRadius: 8, marginBottom: 22, fontWeight: 600,
-            }}>
-              Товар: {product.name}
-            </div>
-
-            <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>Имя</label>
-              <input
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                placeholder="Ваше имя"
-                style={inputStyle}
-              />
+            <h3 style={{ fontSize: 22, fontWeight: 800, marginBottom: 6, paddingRight: 36, color: '#0A0F1E' }}>Оставить заявку</h3>
+            <div style={{ fontSize: 13, color: '#64748B', background: '#F8FAFC', padding: '8px 12px', borderRadius: 10, marginBottom: 24, fontWeight: 500, border: '1px solid #E8EFF8' }}>
+              {product.name}
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>Телефон</label>
-              <input
-                value={form.phone}
-                onChange={e => { const v = e.target.value; if (v.startsWith('+998')) setForm({ ...form, phone: v }) }}
-                placeholder="+998 90 000 00 00"
-                type="tel"
-                style={inputStyle}
-              />
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 7 }}>Имя</label>
+              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Ваше имя"/>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <label style={labelStyle}>
-                Сообщение <span style={{ fontWeight: 400, opacity: 0.6 }}>(необязательно)</span>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 7 }}>Телефон</label>
+              <input value={form.phone} onChange={e => { const v = e.target.value; if (v.startsWith('+998')) setForm({ ...form, phone: v }) }} placeholder="+998 90 000 00 00" type="tel"/>
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 7 }}>
+                Сообщение <span style={{ fontWeight: 400, opacity: 0.6, textTransform: 'none', letterSpacing: 0 }}>(необязательно)</span>
               </label>
-              <textarea
-                value={form.message}
-                onChange={e => setForm({ ...form, message: e.target.value })}
-                placeholder="Объём, количество, вопросы..."
-                rows={3}
-                style={{ ...inputStyle, resize: 'vertical' }}
-              />
+              <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Объём, количество, вопросы..." rows={3}/>
             </div>
-
-            {error && (
-              <div style={{ fontSize: 13, color: '#D85A30', background: '#FAECE7', padding: '10px 14px', borderRadius: 10, marginBottom: 14 }}>
-                {error}
-              </div>
-            )}
-
-            <button
-              onClick={submit}
-              disabled={loading}
-              style={{
-                width: '100%', padding: 15, background: '#1A6FB0', color: 'white',
-                border: 'none', borderRadius: 50, fontFamily: 'inherit', fontSize: 15,
-                fontWeight: 800, cursor: loading ? 'default' : 'pointer',
-                opacity: loading ? 0.7 : 1, transition: 'background 0.2s',
-              }}
-            >
+            {error && <div style={{ fontSize: 13, color: '#B91C1C', background: '#FEF2F2', padding: '10px 14px', borderRadius: 10, marginBottom: 14, border: '1px solid #FCA5A5' }}>{error}</div>}
+            <button onClick={submit} disabled={loading} style={{ width: '100%', padding: 15, background: '#1A6FB0', color: 'white', border: 'none', borderRadius: 50, fontFamily: 'inherit', fontSize: 15, fontWeight: 700, cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1, transition: 'background 0.2s' }}>
               {loading ? 'Отправляем...' : 'Отправить заявку →'}
             </button>
           </>
@@ -231,10 +105,7 @@ export default function CatalogPage() {
       _id, name, category, volume, price, oldPrice, uzumUrl, description,
       "slug": slug.current,
       "imageUrl": image.asset->url
-    }`).then(data => {
-      setProducts(data)
-      setLoading(false)
-    })
+    }`).then(data => { setProducts(data); setLoading(false) })
   }, [])
 
   const filtered = cat === 'all' ? products : products.filter(p => p.category === cat)
@@ -243,198 +114,139 @@ export default function CatalogPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Nunito', -apple-system, sans-serif; background: #F7F9FC; color: #1A2332; }
-        a { text-decoration: none; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #F8FAFC; color: #0A0F1E; -webkit-font-smoothing: antialiased; }
+        a { text-decoration: none; color: inherit; }
 
-        .hdr-nav a:hover { color: #1A6FB0 !important; }
-        .f-btn:hover { border-color: #1A6FB0 !important; color: #1A6FB0 !important; }
-        .p-card:hover { box-shadow: 0 10px 32px rgba(15,28,46,0.12) !important; }
-        .btn-uzum:hover { background: #0F4F85 !important; }
-        .btn-req:hover { border-color: #1A6FB0 !important; background: #E8F4FD !important; }
+        .hdr-nav a { font-size: 15px; font-weight: 500; color: #4A5568; transition: color 0.15s; }
+        .hdr-nav a:hover, .hdr-nav a.active { color: #1A6FB0 !important; }
+
+        .f-btn { font-family: inherit; border: none; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+        .f-btn:hover { background: #EFF6FF !important; color: #1A6FB0 !important; }
+
+        .p-card { background: white; border-radius: 20px; border: 1px solid #E8EFF8; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.2s, transform 0.2s; }
+        .p-card:hover { box-shadow: 0 12px 36px rgba(15,28,46,0.10) !important; transform: translateY(-3px); }
+        .btn-uzum { display: block; text-align: center; background: #1A6FB0; color: white; border: none; border-radius: 12px; padding: 13px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-uzum:hover { background: #0F5090 !important; }
+        .btn-req { display: block; text-align: center; background: white; color: #1A6FB0; border: 1.5px solid #BFDBFE; border-radius: 12px; padding: 11px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-req:hover { background: #EFF6FF !important; border-color: #1A6FB0 !important; }
+
+        input, textarea { width: 100%; padding: 13px 15px; border: 1.5px solid #E2E8F0; border-radius: 12px; font-family: inherit; font-size: 15px; color: #0A0F1E; background: #F8FAFC; outline: none; transition: border-color 0.2s, background 0.2s; }
         input:focus, textarea:focus { border-color: #1A6FB0 !important; background: white !important; }
+        textarea { resize: vertical; }
 
-        @media (max-width: 900px) {
-          .p-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (max-width: 500px) {
-          .p-grid { grid-template-columns: 1fr !important; }
-          .cat-hero h1 { font-size: 24px !important; }
-          .hdr-phone { display: none !important; }
-          .hdr-nav { display: none !important; }
-        }
+        @media (max-width: 1024px) { .p-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+        @media (max-width: 768px) { .p-grid { grid-template-columns: repeat(2, 1fr) !important; } .hdr-phone { display: none !important; } }
+        @media (max-width: 500px) { .p-grid { grid-template-columns: 1fr !important; } .hdr-nav { display: none !important; } }
       `}</style>
 
-      <Header />
-
-      {/* CATEGORY HERO */}
-      <div className="cat-hero" style={{
-        background: 'linear-gradient(135deg, #0D2547 0%, #1A6FB0 100%)',
-        padding: '40px 24px', color: 'white',
-      }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 6, fontWeight: 600 }}>
-            <a href="/" style={{ color: 'white', opacity: 0.6 }}>Главная</a> / Каталог
+      {/* HEADER */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid #F1F5F9' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 28px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {LOGO}
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.5px' }}><span style={{ color: '#1A6FB0' }}>Aqua</span>Dom</div>
+              <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2, letterSpacing: '0.05em' }}>ДИСТИЛЛИРОВАННАЯ ВОДА</div>
+            </div>
+          </a>
+          <nav className="hdr-nav" style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
+            <a href="/">Главная</a>
+            <a href="/catalog" className="active">Каталог</a>
+            <a href="/b2b">Для бизнеса</a>
+          </nav>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <a href={`tel:${PHONE}`} className="hdr-phone" style={{ fontSize: 15, fontWeight: 600, color: '#0A0F1E' }}>{PHONE_DISPLAY}</a>
+            <a href={TG} target="_blank" rel="noopener" style={{ background: '#1A6FB0', color: 'white', padding: '9px 20px', borderRadius: 50, fontSize: 14, fontWeight: 600 }}>Написать →</a>
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-1px', marginBottom: 4 }}>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <div style={{ position: 'relative', overflow: 'hidden', background: '#FAFCFF', padding: '52px 28px 44px', borderBottom: '1px solid #E8EFF8' }}>
+        <div style={{ position: 'absolute', right: -150, top: -150, width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(26,111,176,0.09) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 16, fontWeight: 500 }}>
+            <a href="/" style={{ color: '#94A3B8' }}>Главная</a>
+            <span style={{ margin: '0 8px' }}>/</span>
+            <span style={{ color: '#1A6FB0', fontWeight: 600 }}>Каталог</span>
+          </div>
+          <h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900, letterSpacing: '-1.5px', color: '#0A0F1E', lineHeight: 1.1, marginBottom: 12 }}>
             Каталог продукции
           </h1>
-          <p style={{ fontSize: 15, opacity: 0.7 }}>
+          <p style={{ fontSize: 17, color: '#64748B', lineHeight: 1.6 }}>
             Дистиллированная вода собственного производства · ГОСТ · pH = 0
           </p>
         </div>
       </div>
 
       {/* FILTERS */}
-      <div style={{ background: 'white', borderBottom: '1px solid #E5EEF8', overflowX: 'auto' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '14px 24px', display: 'flex', gap: 8, whiteSpace: 'nowrap' }}>
+      <div style={{ background: 'white', borderBottom: '1px solid #E8EFF8', overflowX: 'auto' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '14px 28px', display: 'flex', gap: 8, whiteSpace: 'nowrap' }}>
           {available.map(k => (
-            <button
-              key={k}
-              className="f-btn"
-              onClick={() => setCat(k)}
-              style={{
-                background: cat === k ? '#1A6FB0' : 'white',
-                border: `2px solid ${cat === k ? '#1A6FB0' : '#E5EEF8'}`,
-                borderRadius: 50,
-                padding: '8px 18px',
-                fontFamily: 'inherit',
-                fontSize: 13,
-                fontWeight: 700,
-                color: cat === k ? 'white' : '#5A7090',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {k === 'all'
-                ? `Все (${products.length})`
-                : `${CATS[k]} (${products.filter(p => p.category === k).length})`
-              }
+            <button key={k} className="f-btn" onClick={() => setCat(k)} style={{
+              background: cat === k ? '#1A6FB0' : '#F8FAFC',
+              border: `1.5px solid ${cat === k ? '#1A6FB0' : '#E2E8F0'}`,
+              borderRadius: 50, padding: '9px 20px',
+              fontSize: 14, fontWeight: 600,
+              color: cat === k ? 'white' : '#4A5568',
+            }}>
+              {k === 'all' ? `Все (${products.length})` : `${CATS[k]} (${products.filter(p => p.category === k).length})`}
             </button>
           ))}
         </div>
       </div>
 
       {/* GRID */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 64px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 28px 72px' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 24px', color: '#5A7090', fontSize: 16 }}>
-            Загружаем товары...
-          </div>
+          <div style={{ textAlign: 'center', padding: '80px 24px', color: '#94A3B8', fontSize: 16 }}>Загружаем товары...</div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 24px' }}>
-            <div style={{ fontSize: 52, marginBottom: 16 }}>💧</div>
-            <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Товары скоро появятся</div>
-            <div style={{ fontSize: 14, color: '#5A7090', marginBottom: 24 }}>
-              Напишите нам в Telegram — поможем с выбором
-            </div>
-            <a
-              href={TG}
-              target="_blank"
-              rel="noopener"
-              style={{
-                display: 'inline-block', background: '#1A6FB0', color: 'white',
-                padding: '13px 28px', borderRadius: 50, fontWeight: 700, fontSize: 14,
-              }}
-            >
-              Написать в Telegram
+            <div style={{ fontSize: 56, marginBottom: 16 }}>💧</div>
+            <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 10, color: '#0A0F1E' }}>Товары скоро появятся</div>
+            <div style={{ fontSize: 16, color: '#64748B', marginBottom: 28 }}>Напишите нам в Telegram — поможем с выбором</div>
+            <a href={TG} target="_blank" rel="noopener" style={{ display: 'inline-block', background: '#1A6FB0', color: 'white', padding: '14px 32px', borderRadius: 50, fontWeight: 700, fontSize: 15 }}>
+              Написать в Telegram →
             </a>
           </div>
         ) : (
-          <div
-            className="p-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-              gap: 20,
-            }}
-          >
+          <div className="p-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
             {filtered.map(p => {
-              const disc = p.oldPrice && p.price < p.oldPrice
-                ? Math.round((1 - p.price / p.oldPrice) * 100)
-                : 0
-
+              const disc = p.oldPrice && p.price < p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0
               return (
-                <div
-                  key={p._id}
-                  className="p-card"
-                  style={{
-                    background: 'white', borderRadius: 16,
-                    border: '1px solid #E5EEF8', overflow: 'hidden',
-                    transition: 'box-shadow 0.2s',
-                    display: 'flex', flexDirection: 'column',
-                  }}
-                >
-                  {/* IMAGE — clickable */}
-                  <a href={`/catalog/${p.slug || p._id}`} style={{
-                    position: 'relative', background: '#F7F9FC',
-                    height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    overflow: 'hidden', textDecoration: 'none',
-                  }}>
+                <div key={p._id} className="p-card">
+                  {/* IMAGE */}
+                  <a href={`/catalog/${p.slug || p._id}`} style={{ position: 'relative', background: '#F8FAFC', height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                     {p.imageUrl
-                      ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 16 }} />
-                      : <span style={{ fontSize: 64 }}>💧</span>
+                      ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 20 }}/>
+                      : <span style={{ fontSize: 72 }}>💧</span>
                     }
                     {disc > 0 && (
-                      <span style={{
-                        position: 'absolute', top: 10, right: 10,
-                        background: '#D85A30', color: 'white',
-                        fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 20,
-                      }}>−{disc}%</span>
+                      <span style={{ position: 'absolute', top: 12, right: 12, background: '#EF4444', color: 'white', fontSize: 12, fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>−{disc}%</span>
                     )}
                   </a>
 
                   {/* BODY */}
-                  <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <div style={{ padding: '18px 18px 20px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#1A6FB0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {CATS[p.category] || p.category}
                     </div>
-                    <a href={`/catalog/${p.slug || p._id}`} style={{ fontSize: 15, fontWeight: 800, color: '#1A2332', lineHeight: 1.3, textDecoration: 'none' }}>
+                    <a href={`/catalog/${p.slug || p._id}`} style={{ fontSize: 15, fontWeight: 700, color: '#0A0F1E', lineHeight: 1.35 }}>
                       {p.name}
                     </a>
-                    {p.volume && (
-                      <div style={{ fontSize: 12, color: '#5A7090' }}>{p.volume} л</div>
-                    )}
+                    {p.volume && <div style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>{p.volume} л</div>}
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-                      <span style={{ fontSize: 20, fontWeight: 900, color: '#0F4F85' }}>{fmt(p.price)}</span>
-                      {p.oldPrice && (
-                        <span style={{ fontSize: 13, color: '#B0C0D0', textDecoration: 'line-through' }}>{fmt(p.oldPrice)}</span>
-                      )}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 6 }}>
+                      <span style={{ fontSize: 20, fontWeight: 800, color: '#0A0F1E', letterSpacing: '-0.5px' }}>{fmt(p.price)}</span>
+                      {p.oldPrice && <span style={{ fontSize: 13, color: '#CBD5E1', textDecoration: 'line-through' }}>{fmt(p.oldPrice)}</span>}
                     </div>
 
-                    {/* ACTIONS */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto', paddingTop: 8 }}>
-                      {p.uzumUrl && (
-                        <a
-                          href={p.uzumUrl}
-                          target="_blank"
-                          rel="noopener"
-                          className="btn-uzum"
-                          style={{
-                            background: '#1A6FB0', color: 'white', border: 'none',
-                            borderRadius: 10, padding: 11, fontFamily: 'inherit',
-                            fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                            textAlign: 'center', display: 'block', transition: 'background 0.2s',
-                          }}
-                        >
-                          Купить на Uzum →
-                        </a>
-                      )}
-                      <button
-                        className="btn-req"
-                        onClick={() => setModal(p)}
-                        style={{
-                          background: 'white', color: '#1A6FB0',
-                          border: '2px solid #BEDAF5', borderRadius: 10, padding: 9,
-                          fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
-                          cursor: 'pointer', transition: 'all 0.2s',
-                        }}
-                      >
-                        Оставить заявку
-                      </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto', paddingTop: 12 }}>
+                      {p.uzumUrl && <a href={p.uzumUrl} target="_blank" rel="noopener" className="btn-uzum">Купить на Uzum →</a>}
+                      <button className="btn-req" onClick={() => setModal(p)}>Оставить заявку</button>
                     </div>
                   </div>
                 </div>
@@ -445,17 +257,20 @@ export default function CatalogPage() {
       </div>
 
       {/* FOOTER */}
-      <footer style={{ background: '#0D2547', color: 'white', padding: '40px 24px 28px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 800 }}>
-              <span style={{ fontWeight: 300, opacity: 0.7 }}>Aqua</span>Dom
+      <footer style={{ background: '#080F1E', color: 'white', padding: '48px 28px 28px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24, marginBottom: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {LOGO}
+              <div style={{ fontSize: 18, fontWeight: 800 }}><span style={{ color: '#60A5FA' }}>Aqua</span>Dom</div>
             </div>
-            <div style={{ fontSize: 11, opacity: 0.35, marginTop: 4 }}>Не для питья</div>
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+              <a href={`tel:${PHONE}`} style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>📞 {PHONE_DISPLAY}</a>
+              <a href={TG} target="_blank" rel="noopener" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>✈ @aquadomm_bot</a>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <a href={`tel:${PHONE}`} style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>📞 {PHONE_DISPLAY}</a>
-            <a href={TG} target="_blank" rel="noopener" style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>✈ @aquadomm_bot</a>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>
+            © 2025 AquaDom — Не для питья · Только для технических нужд
           </div>
         </div>
       </footer>
